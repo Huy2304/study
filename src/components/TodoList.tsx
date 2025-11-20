@@ -1,7 +1,4 @@
-// components/TodoList.tsx
-'use client';
-
-import { useState } from 'react';
+import {useEffect, useState} from 'react';
 import { Plus, Trash2, Check, X } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -10,6 +7,25 @@ export default function TodoList() {
     const [todos, setTodos] = useState<string[]>([]);
     const [inputValue, setInputValue] = useState('');
     const [completed, setCompleted] = useState<Set<number>>(new Set());
+    const [open, setOpen] = useState(false);
+    // Load dữ liệu khi component mount
+    useEffect(() => {
+        const savedTodos = localStorage.getItem('studyfocus-todos');
+        const savedCompleted = localStorage.getItem('studyfocus-completed');
+
+        if (savedTodos) {
+            setTodos(JSON.parse(savedTodos));
+        }
+        if (savedCompleted) {
+            setCompleted(new Set(JSON.parse(savedCompleted)));
+        }
+    }, []); // chỉ chạy 1 lần khi mount
+
+// Lưu dữ liệu mỗi khi todos hoặc completed thay đổi
+    useEffect(() => {
+        localStorage.setItem('studyfocus-todos', JSON.stringify(todos));
+        localStorage.setItem('studyfocus-completed', JSON.stringify(Array.from(completed)));
+    }, [todos, completed]);
 
     const addTodo = () => {
         if (inputValue.trim()) {

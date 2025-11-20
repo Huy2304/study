@@ -2,7 +2,6 @@
 import { Timer } from "@/components/Timer";
 import BottomBar from "@/components/BottomBar";
 import HeaderBar from "@/components/HeaderBar";
-import TodoList from "@/components/TodoList";
 
 export default function Home() {
   return (
@@ -19,7 +18,6 @@ export default function Home() {
             What are you working on?
           </p>
         </div>
-        <TodoList/>
 
         {/* Bottom Bar */}
         <BottomBar />

@@ -1,4 +1,4 @@
-// lib/FocusModeContext.tsx
+// lib/FocusModeContext.tsx  ← Chỉ sửa file này một chút
 'use client';
 
 import { createContext, useContext, useState, ReactNode } from 'react';

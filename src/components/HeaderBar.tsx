@@ -2,12 +2,16 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { LampDesk, Users, Volume2, VolumeX, MoreVertical, Globe, Share2, Calendar } from "lucide-react";
+import {LampDesk, Users, Volume2, VolumeX, MoreVertical, Globe, Share2, Calendar, Book} from "lucide-react";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import TodoList from "@/components/TodoList";
+import UserPanel from "@/components/UserPanel";
+
 
 export default function HeaderBar() {
     const [isMuted, setIsMuted] = useState(false);
     const [now, setNow] = useState(new Date());
+    const [showTodoList, setShowTodoList] = useState(false);
 
     // Đồng hồ chạy thật - cập nhật mỗi giây
     useEffect(() => {
@@ -51,18 +55,14 @@ export default function HeaderBar() {
 
                 {/* Center: Room Info + ĐỒNG HỒ + Controls */}
                 <div className="flex items-center gap-6 text-white/80">
-
                     {/* Room Name */}
                     <Tooltip>
                         <TooltipTrigger asChild>
                             <button className="flex items-center gap-2 hover:text-white transition">
                                 <Users size={18} />
-                                <span className="text-sm font-medium">User's room</span>
+                                <span className="text-sm font-medium">User room</span>
                             </button>
                         </TooltipTrigger>
-                        <TooltipContent>
-                            <p>You're studying with 127 others</p>
-                        </TooltipContent>
                     </Tooltip>
 
                     {/* ĐỒNG HỒ THỰC + NGÀY THÁNG */}
@@ -84,8 +84,20 @@ export default function HeaderBar() {
                 </div>
 
                 {/* Right: Actions */}
-                <div className="flex items-center gap-3">
-
+                <div className="flex items-center gap-4">
+                    <Tooltip>
+                        <TooltipTrigger asChild>
+                            <button
+                                onClick={() => setShowTodoList(!showTodoList)}
+                                className="relative p-2.5 rounded-lg hover:bg-white/10 transition"
+                            >
+                                <Book size={20} />
+                            </button>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                            {showTodoList ? 'Ẩn Todo List' : 'Hiện Todo List'}
+                        </TooltipContent>
+                    </Tooltip>
                     <Tooltip>
                         <TooltipTrigger asChild>
                             <button className="p-2.5 rounded-lg hover:bg-white/10 transition">
@@ -113,12 +125,10 @@ export default function HeaderBar() {
                         <TooltipContent>More options</TooltipContent>
                     </Tooltip>
 
-                    {/* Avatar User */}
-                    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-white font-bold text-sm shadow-lg ring-2 ring-white/20">
-                        U
-                    </div>
+                    <UserPanel />
                 </div>
             </div>
+            {showTodoList && <TodoList />}
         </div>
     );
 }
