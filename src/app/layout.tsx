@@ -3,6 +3,7 @@ import "./globals.css";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { FocusModeProvider } from "@/lib/FocusModeContext";
 import { BackgroundProvider, useBackground } from "@/lib/BackgroundContext";
+import { Analytics } from "@vercel/analytics/next"
 
 // Component con để render background từ Context
 function DynamicBackground() {
@@ -32,6 +33,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 <FocusModeProvider>
                     <TooltipProvider>
                         {children}
+                        <Analytics />
                     </TooltipProvider>
                 </FocusModeProvider>
             </main>
