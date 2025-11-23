@@ -22,7 +22,7 @@ export default function BackgroundChanger() {
         <>
             <button
                 onClick={() => setIsOpen(true)}
-                className="text-white/60 hover:text-white hover:scale-110 transition"
+                className="flex items-center justify-center w-12 h-12 rounded-xl bg-white/10 hover:bg-white/20 backdrop-blur-xl border border-white/20 transition-all hover:scale-110 group relative"
                 title="Đổi background"
             >
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"

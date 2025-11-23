@@ -47,8 +47,7 @@ export default function MiniYoutubePlayer() {
             {/* Nút nổi cố định góc dưới trái */}
             <button
                 onClick={togglePlayer}
-                className="fixed z-[999] p-4 bg-gradient-to-br "
-                title={isMusicOn ? "Đóng/Mở Mini Player" : "Phát nhạc nền"}
+                className="flex items-center justify-center w-12 h-12 rounded-xl bg-white/10 hover:bg-white/20 backdrop-blur-xl border border-white/20 transition-all hover:scale-110 group relative"
             >
                 {isMusicOn && isPlayerOpen ? <X size={24} /> : <Radio size={24} />}
             </button>

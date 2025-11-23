@@ -52,10 +52,10 @@ export default function Support() {
         return (
             <button
                 onClick={() => setOpen(true)}
-                className="fixed bottom-24 right-6 z-40 flex items-center gap-3 rounded-full bg-white/10 backdrop-blur-xl px-5 py-3 text-white hover:bg-white/20 transition shadow-xl border border-white/20"
+                className="flex items-center justify-center w-12 h-12 rounded-xl bg-white/10 hover:bg-white/20 backdrop-blur-xl border border-white/20 transition-all hover:scale-110 group"
+                title="Góp ý / Báo lỗi"
             >
-                <Mail size={20} />
-                <span className="font-medium">Góp ý / Báo lỗi</span>
+                <Mail size={22} className="text-white/70 group-hover:text-white transition" />
             </button>
         );
     }
