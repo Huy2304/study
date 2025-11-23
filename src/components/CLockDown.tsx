@@ -111,14 +111,28 @@ export function CLockDown() {
             </div>
 
             {/* ============= POPUP SETUP TIMER ============= */}
+            {/* ============= POPUP SETUP TIMER ============= */}
             {showSetup && !isSuperFocus && (
                 <div
                     ref={setupRef}
                     className="fixed inset-0 flex items-center justify-center z-50 pointer-events-auto"
                     style={{ backdropFilter: "blur(8px)" }}
                 >
-                    <div className="bg-black/90 border border-white/20 rounded-2xl p-8 max-w-md w-full mx-4 shadow-2xl">
-                        <h3 className="text-2xl font-bold text-white mb-6 text-center">Timer Setup</h3>
+                    <div className="relative bg-black/90 border border-white/20 rounded-2xl p-8 max-w-md w-full mx-4 shadow-2xl">
+                        {/* Nút X đóng popup */}
+                        <button
+                            onClick={() => setShowSetup(false)}
+                            className="absolute top-4 right-4 text-white/50 hover:text-white/90 transition
+                         w-10 h-10 flex items-center justify-center rounded-full hover:bg-white/10"
+                            aria-label="Close"
+                        >
+                            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                        </button>
+
+                        <h3 className="text-2xl font-bold text-white mb-6 text-center pr-8">Timer Setup</h3>
+                        {/* pr-8 để tránh chữ bị đè bởi nút X */}
 
                         {/* Danh sách preset */}
                         <div className="space-y-3">
