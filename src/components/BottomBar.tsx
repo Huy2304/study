@@ -15,9 +15,6 @@ export default function BottomBar() {
 
                 {/* BÊN TRÁI: Ẩn nhưng vẫn chiếm chỗ khi super focus */}
                 <div className={`flex items-center gap-8 ${isSuperFocus ? 'invisible' : ''}`}>
-                    <button className="text-white/60 hover:text-white transition">
-                        <Home size={24} />
-                    </button>
 
                     <MusicTooltip />   {/* Giữ nguyên */}
                     <MiniYoutubePlayer />
