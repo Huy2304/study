@@ -118,7 +118,11 @@ export function CLockDown() {
                 <div
                     onClick={toggleTimer}
                     className={`select-none cursor-pointer font-bold tracking-wider text-white leading-none drop-shadow-2xl transition-all duration-700
-            ${isSuperFocus ? "text-[14vw] md:text-[12vw] lg:text-[11vw] xl:text-[10vw]" : "text-[7em] sm:text-[9em] md:text-[11em] lg:text-[13em] xl:text-[15em]"}`}
+            ${
+                        isSuperFocus
+                            ? "text-[18vw] sm:text-[16vw] md:text-[14vw] lg:text-[12vw] xl:text-[10vw] 2xl:text-[9vw]"
+                            : "text-[16vw] sm:text-[11vw] md:text-[10vw] lg:text-[9vw]  xl:text-[8vw]  2xl:text-[7vw]"
+                    }`}
                     style={{ textShadow: "0 0 80px rgba(255,255,255,0.5)", fontVariantNumeric: "tabular-nums" }}
                 >
                     {format(timeLeft)}
