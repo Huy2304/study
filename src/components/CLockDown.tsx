@@ -4,7 +4,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { Button } from "@/components/ui/button";
 import { useFocusMode } from "@/lib/FocusModeContext";
-import { Timer, Clock, ChevronDown, Plus, Settings } from "lucide-react";
+import { ChevronDown, Plus, Settings } from "lucide-react";
 
 const presets = [
     { name: "Deep Work",      work: 90, short: 15, long: 45 },
