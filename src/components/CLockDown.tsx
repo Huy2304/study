@@ -115,70 +115,74 @@ export function CLockDown() {
                 </div>
             </div>
 
-            {/* Popup Setup Timer */}
+            {/* Popup Setup Timer - Chỉnh để không đè header/bottom, thu nhỏ, và UX tốt hơn */}
             {showSetup && !isSuperFocus && (
-                <div ref={setupRef} className="fixed inset-0 flex items-center justify-center z-50 pointer-events-auto" style={{ backdropFilter: "blur(8px)" }}>
-                    <div className="relative bg-black/90 border border-white/20 rounded-2xl p-8 max-w-md w-full mx-4 shadow-2xl">
+                <div
+                    ref={setupRef}
+                    className="fixed top-16 bottom-20 left-0 right-0 flex items-center justify-center z-[100] pointer-events-auto"
+
+                >
+                    <div className="relative bg-black/90 border border-white/20 rounded-2xl p-6 max-w-sm w-full mx-4 shadow-2xl overflow-y-auto max-h-[80vh] transition-all duration-300 scale-100 hover:scale-105"> {/* Thu nhỏ max-w-sm, p-6, thêm animation scale */}
                         <button
                             onClick={() => setShowSetup(false)}
-                            className="absolute top-4 right-4 text-white/50 hover:text-white/90 transition w-10 h-10 flex items-center justify-center rounded-full hover:bg-white/10"
+                            className="absolute top-3 right-3 text-white/50 hover:text-white/90 transition w-8 h-8 flex items-center justify-center rounded-full hover:bg-white/10"
                             aria-label="Close"
                         >
-                            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                             </svg>
                         </button>
 
-                        <h3 className="text-2xl font-bold text-white mb-6 text-center pr-8">Timer Setup</h3>
+                        <h3 className="text-xl font-bold text-white mb-4 text-center pr-6">Timer Setup</h3> {/* Giảm size text, margin */}
 
-                        {/* Danh sách preset */}
-                        <div className="space-y-3">
+                        {/* Danh sách preset - Làm ngắn gọn hơn */}
+                        <div className="space-y-2"> {/* Giảm space-y-3 thành 2 */}
                             {presets.map((p) => (
                                 <button
                                     key={p.name}
                                     onClick={() => setNewTimer(p.work * 60)}
-                                    className={`w-full text-left p-4 rounded-xl transition ${duration === p.work * 60 ? "bg-white/20 border border-white/40" : "bg-white/5 hover:bg-white/10 border border-transparent"}`}
+                                    className={`w-full text-left p-3 rounded-lg transition ${duration === p.work * 60 ? "bg-white/20 border border-white/40" : "bg-white/5 hover:bg-white/10 border border-transparent"}`} // Giảm p-4 thành p-3
                                 >
                                     <div className="flex items-center justify-between">
                                         <div>
-                                            <div className="font-medium text-white">{p.name}</div>
-                                            <div className="text-sm text-white/60">
+                                            <div className="font-medium text-white text-sm">{p.name}</div> {/* Giảm text size */}
+                                            <div className="text-xs text-white/60">
                                                 {p.work}m work · {p.short}m short · {p.long}m long
                                             </div>
                                         </div>
-                                        {duration === p.work * 60 && <div className="w-3 h-3 bg-white rounded-full" />}
+                                        {duration === p.work * 60 && <div className="w-2 h-2 bg-white rounded-full" />} {/* Giảm size dot */}
                                     </div>
                                 </button>
                             ))}
                         </div>
 
                         {/* Phần custom timer */}
-                        <div className="mt-6 pt-6 border-t border-white/10">
+                        <div className="mt-4 pt-4 border-t border-white/10"> {/* Giảm mt-6 pt-6 thành 4 */}
                             <Button
-                                className="w-full rounded-xl"
+                                className="w-full rounded-lg text-sm py-2" // Thu nhỏ button, text-sm
                                 variant="outline"
                                 onClick={() => setShowCustomForm(!showCustomForm)}
                             >
-                                <Plus size={18} className="mr-2" />
+                                <Plus size={16} className="mr-2" /> {/* Giảm size icon */}
                                 {showCustomForm ? "Cancel Custom Timer" : "Add Custom Timer"}
                             </Button>
 
                             {showCustomForm && (
-                                <div className="mt-4 space-y-4">
-                                    <div className="flex gap-4">
-                                        <div className="flex-1">
-                                            <label className="block text-sm text-white/80 mb-1">Hours</label>
+                                <div className="mt-3 space-y-3"> {/* Giảm mt-4 space-y-4 thành 3 */}
+                                    <div className="flex gap-3 justify-center">
+                                        <div className="flex-1 max-w-[120px]"> {/* Giảm max-w-150 thành 120 */}
+                                            <label className="block text-xs text-white/80 mb-1">Hours</label> {/* text-xs */}
                                             <input
                                                 type="number"
                                                 min="0"
                                                 step="1"
                                                 value={customHours}
                                                 onChange={(e) => setCustomHours(Math.max(0, parseInt(e.target.value) || 0))}
-                                                className="w-full p-2 rounded-lg bg-white/10 border border-white/20 text-white focus:outline-none focus:border-white/40"
+                                                className="w-full p-1.5 rounded-md bg-white/10 border border-white/20 text-white focus:outline-none focus:border-white/40 text-sm" // Giảm p-2 thành 1.5, rounded-md, text-sm
                                             />
                                         </div>
-                                        <div className="flex-1">
-                                            <label className="block text-sm text-white/80 mb-1">Minutes</label>
+                                        <div className="flex-1 max-w-[120px]">
+                                            <label className="block text-xs text-white/80 mb-1">Minutes</label>
                                             <input
                                                 type="number"
                                                 min="0"
@@ -186,12 +190,12 @@ export function CLockDown() {
                                                 step="1"
                                                 value={customMinutes}
                                                 onChange={(e) => setCustomMinutes(Math.min(59, Math.max(0, parseInt(e.target.value) || 0)))}
-                                                className="w-full p-2 rounded-lg bg-white/10 border border-white/20 text-white focus:outline-none focus:border-white/40"
+                                                className="w-full p-1.5 rounded-md bg-white/10 border border-white/20 text-white focus:outline-none focus:border-white/40 text-sm"
                                             />
                                         </div>
                                     </div>
                                     <Button
-                                        className="w-full rounded-xl bg-white/20 hover:bg-white/30"
+                                        className="w-full rounded-lg bg-white/20 hover:bg-white/30 transition-colors shadow-md text-sm py-2" // Thu nhỏ, text-sm
                                         onClick={applyCustomTimer}
                                     >
                                         Apply Custom Timer
