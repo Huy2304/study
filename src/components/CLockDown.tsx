@@ -36,11 +36,42 @@ export function CLockDown() {
         }
     }, [showSetup]);
 
+// TIMER SIÊU MƯỢT + HIỂN THỊ REALTIME TRÊN TAB TITLE
     useEffect(() => {
         if (!isRunning || timeLeft <= 0) return;
-        const id = setInterval(() => setTimeLeft(t => t > 0 ? t - 1 : 0), 1000);
-        return () => clearInterval(id);
-    }, [isRunning, timeLeft]);
+
+        const intervalId = setInterval(() => {
+            setTimeLeft(prev => {
+                const next = prev - 1;
+
+                // CẬP NHẬT TITLE MỖI GIÂY
+                if (next > 0) {
+                    const m = Math.floor(next / 60);
+                    const s = next % 60;
+                    document.title = `${m}:${s.toString().padStart(2, "0")} - Focus`;
+                } else {
+                    document.title = "00:00 - Time's up!";
+                }
+
+                return next >= 0 ? next : 0;
+            });
+        }, 1000);
+
+        return () => clearInterval(intervalId);
+    }, [isRunning]); // Chỉ depend vào isRunning → không re-create interval mỗi giây!
+    useEffect(() => {
+        if (isRunning) return;
+
+        if (timeLeft === 0) {
+            document.title = "00:00 - Time's up!";
+        } else if (timeLeft === duration) {
+            document.title = "StudyHay - Focus Timer";
+        } else {
+            const m = Math.floor(timeLeft / 60);
+            const s = timeLeft % 60;
+            document.title = `${m}:${s.toString().padStart(2, "0")} - Focus`;
+        }
+    }, [isRunning, timeLeft, duration]);
 
     const toggleTimer = () => {
         if (timeLeft === 0) setTimeLeft(duration);
