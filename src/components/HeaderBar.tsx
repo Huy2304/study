@@ -1,15 +1,13 @@
-// components/HeaderBar.tsx
-'use client';
-
+"use client"
 import { useState, useEffect } from 'react';
-import {LampDesk, Users, Volume2, VolumeX, MoreVertical, Globe, Share2, Calendar, Book} from "lucide-react";
+import {LampDesk, Calendar, Book} from "lucide-react";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import TodoList from "@/components/TodoList";
-import UserPanel from "@/components/UserPanel";
 import {useFocusMode} from "@/lib/FocusModeContext";
+import UserPanel from "@/components/UserPanel";
+
 
 export default function HeaderBar() {
-    const [isMuted, setIsMuted] = useState(false);
     const [now, setNow] = useState(new Date());
     const [showTodoList, setShowTodoList] = useState(false);
     const { isSuperFocus } = useFocusMode();  // Không cần toggleSuperFocus nếu không dùng ở đây
@@ -56,16 +54,6 @@ export default function HeaderBar() {
 
                 {/* Center: Room Info + ĐỒNG HỒ + Controls */}
                 <div className="flex items-center gap-6 text-white/80">
-                    {/* Room Name */}
-                    {/*<Tooltip>*/}
-                    {/*    <TooltipTrigger asChild>*/}
-                    {/*        <button className="flex items-center gap-2 hover:text-white transition">*/}
-                    {/*            <Users size={18} />*/}
-                    {/*            <span className="text-sm font-medium">User room</span>*/}
-                    {/*        </button>*/}
-                    {/*    </TooltipTrigger>*/}
-                    {/*</Tooltip>*/}
-
                     {/* ĐỒNG HỒ THỰC + NGÀY THÁNG */}
                     <div className="flex items-center gap-2 bg-white/10 backdrop-blur-xl px-4 py-2 rounded-full border border-white/20">
                         <Calendar size={16} className="text-white/70" />
@@ -118,7 +106,7 @@ export default function HeaderBar() {
                     {/*    <TooltipContent>More options</TooltipContent>*/}
                     {/*</Tooltip>*/}
 
-                    {/*<UserPanel />*/}
+                    <UserPanel />
                 </div>
             </div>
             {showTodoList && <TodoList />}

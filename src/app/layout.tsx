@@ -13,8 +13,8 @@ function DynamicBackground() {
         <div className="fixed inset-0 -z-10 overflow-hidden">
             <img
                 src={currentBg}
-                alt="Dynamic background"
-                className="h-full w-full object-cover object-center scale-105 brightness-90 contrast-110 saturate-110 transition-all duration-1000"
+                alt="Chill nature background"
+                className="fixed inset-0 -z-10 h-full w-full object-cover object-center scale-105 brightness-90 contrast-110 saturate-110 transition-all duration-1000"
             />
             <div className="absolute inset-0 bg-black/40" />
             <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />

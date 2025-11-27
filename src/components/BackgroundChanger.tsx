@@ -11,7 +11,7 @@ const backgrounds = [
     { url: "/images/2.jpg", name: "Cozy Library" },
     { url: "/images/3.jpg", name: "Night City" },
     { url: "/images/4.jpg", name: "Forest Cabin" },
-    { url: "/images/5.jpg", name: "Ocean Sunset" },
+    { url: "/images/forest.gif", name: "Ocean Sunset" },
 ];
 
 export default function BackgroundChanger() {

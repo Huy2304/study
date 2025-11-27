@@ -5,6 +5,7 @@ import MiniYoutubePlayer from "@/components/MiniYoutubePlayer";
 import BackgroundChanger from "@/components/BackgroundChanger";
 import { useFocusMode } from "@/lib/FocusModeContext";
 import Support from "@/components/Support";
+import FloatingPet from "@/components/Pet";
 
 export default function BottomBar() {
     const { isSuperFocus, toggleSuperFocus } = useFocusMode();  // Sử dụng context
@@ -21,6 +22,7 @@ export default function BottomBar() {
 
                     <BackgroundChanger/>
                     <Support/>
+
                 </div>
 
                 {/* BÊN PHẢI: Zap giữ nguyên */}
