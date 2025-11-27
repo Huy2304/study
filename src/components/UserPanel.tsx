@@ -1,4 +1,3 @@
-// components/User/UserPanel.tsx  ← CHỈ 1 FILE DUY NHẤT, DỄ BẢO TRÌ
 "use client"
 
 import { useEffect, useState } from "react"
@@ -65,7 +64,6 @@ export default function UserPanel() {
                                         {user?.email?.split("@")[0] || "Khách"}
                                     </p>
                                     <p className="text-white/70 text-xs flex items-center gap-1">
-                                        <Crown size={14} strokeWidth={2} className="text-yellow-400" />
                                         Pro Member
                                     </p>
                                 </div>
