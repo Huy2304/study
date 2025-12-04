@@ -106,7 +106,7 @@ export default function HeaderBar() {
                     {/*    </TooltipTrigger>*/}
                     {/*    <TooltipContent>More options</TooltipContent>*/}
                     {/*</Tooltip>*/}
-                    <RoomMeet/>
+                    {/*/!*<RoomMeet/>*!/ Đang phát triển*/}
                     <UserPanel />
                 </div>
             </div>
