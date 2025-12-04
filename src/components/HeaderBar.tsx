@@ -5,6 +5,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip
 import TodoList from "@/components/TodoList";
 import {useFocusMode} from "@/lib/FocusModeContext";
 import UserPanel from "@/components/UserPanel";
+import {RoomMeet} from "@/components/room/RoomMeet";
 
 
 export default function HeaderBar() {
@@ -105,7 +106,7 @@ export default function HeaderBar() {
                     {/*    </TooltipTrigger>*/}
                     {/*    <TooltipContent>More options</TooltipContent>*/}
                     {/*</Tooltip>*/}
-
+                    <RoomMeet/>
                     <UserPanel />
                 </div>
             </div>
