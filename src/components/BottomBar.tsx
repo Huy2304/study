@@ -7,6 +7,7 @@ import BackgroundChanger from "@/components/BackgroundChanger";
 import { useFocusMode } from "@/lib/FocusModeContext";
 import Support from "@/components/Support";
 import TranslatePro from "@/components/TranslateWord";
+import QuickMathGame from "@/components/QuickMathGame";
 import { Z_INDEX } from "@/lib/zIndexManager";
 
 export interface BottomBarItem {
@@ -28,8 +29,9 @@ function BottomBar({ items, actionButton }: BottomBarProps) {
         { id: 'music', component: <MusicTooltip />, priority: 1 },
         { id: 'youtube', component: <MiniYoutubePlayer />, priority: 2 },
         { id: 'background', component: <BackgroundChanger />, priority: 3 },
-        { id: 'support', component: <Support />, priority: 4 },
-        { id: 'translate', component: <TranslatePro asIconButton />, priority: 5}
+        { id: 'quickmath', component: <QuickMathGame />, priority: 4 },
+        { id: 'support', component: <Support />, priority: 5 },
+        { id: 'translate', component: <TranslatePro asIconButton />, priority: 6}
     ], []);
     
     // Memoize toggle handler
