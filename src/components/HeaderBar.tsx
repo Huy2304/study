@@ -1,5 +1,5 @@
 "use client"
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import {LampDesk, Calendar, Book} from "lucide-react";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import TodoList from "@/components/TodoList";
@@ -21,8 +21,8 @@ export default function HeaderBar() {
         return () => clearInterval(interval);
     }, []);
 
-    // Format ngày tháng + giờ đẹp
-    const formatDateTime = (date: Date) => {
+    // Memoize format function
+    const formatDateTime = useCallback((date: Date) => {
         const days = ['Chủ Nhật', 'Thứ Hai', 'Thứ Ba', 'Thứ Tư', 'Thứ Năm', 'Thứ Sáu', 'Thứ Bảy'];
         const dayName = days[date.getDay()];
         const day = date.getDate();
@@ -35,12 +35,19 @@ export default function HeaderBar() {
             date: `${dayName}, ${day}/${month}`,
             time: `${hours}:${minutes}:${seconds}`
         };
-    };
+    }, []);
 
-    const { date, time } = formatDateTime(now);
+    const { date, time } = useMemo(() => formatDateTime(now), [formatDateTime, now]);
+    
+    const toggleTodoList = useCallback(() => {
+        setShowTodoList(prev => !prev);
+    }, []);
 
     return (
-        <div className={`fixed inset-x-0 top-0 z-50 ${isSuperFocus ? 'hidden' : ''}`}>  {/* Thêm hidden khi super focus */}
+        <div 
+            className={`fixed inset-x-0 top-0 ${isSuperFocus ? 'hidden' : ''}`}
+            style={{ zIndex: 50 }}
+        >
             <div className="flex items-center justify-between px-5 py-3">
 
                 {/* Left: Logo + Title */}
@@ -54,26 +61,33 @@ export default function HeaderBar() {
                 </div>
 
                 {/* Center: Room Info + ĐỒNG HỒ + Controls */}
-                <div className="flex items-center gap-6 text-white/80">
+                <div className="flex items-center gap-4 sm:gap-6 text-white/80">
                     {/* ĐỒNG HỒ THỰC + NGÀY THÁNG */}
-                    <div className="flex items-center gap-2 bg-white/10 backdrop-blur-xl px-4 py-2 rounded-full border border-white/20">
-                        <Calendar size={16} className="text-white/70" />
-                        <div className="text-right">
-                            <div className="text-xs text-white/70 leading-tight">{date}</div>
-                            <div className="text-lg font-mono text-white tracking-wider">{time}</div>
+                    <div 
+                        className="flex items-center gap-2 bg-white/10 backdrop-blur-xl px-3 sm:px-4 py-2 rounded-full border border-white/20"
+                        role="timer"
+                        aria-live="polite"
+                        aria-label={`Ngày ${date}, giờ ${time}`}
+                    >
+                        <Calendar size={16} className="text-white/70 flex-shrink-0" aria-hidden="true" />
+                        <div className="text-right min-w-0">
+                            <div className="text-xs text-white/70 leading-tight truncate">{date}</div>
+                            <div className="text-base sm:text-lg font-mono text-white tracking-wider">{time}</div>
                         </div>
                     </div>
                 </div>
 
                 {/* Right: Actions */}
-                <div className="flex items-center gap-4">
+                <div className="flex items-center gap-2 sm:gap-4">
                     <Tooltip>
                         <TooltipTrigger asChild>
                             <button
-                                onClick={() => setShowTodoList(!showTodoList)}
-                                className="relative p-2.5 rounded-lg hover:bg-white/10 transition"
+                                onClick={toggleTodoList}
+                                className="relative p-2.5 rounded-lg hover:bg-white/10 transition focus:outline-none focus:ring-2 focus:ring-white/50"
+                                aria-label={showTodoList ? 'Ẩn Todo List' : 'Hiện Todo List'}
+                                aria-expanded={showTodoList}
                             >
-                                <Book size={20} />
+                                <Book size={20} aria-hidden="true" />
                             </button>
                         </TooltipTrigger>
                         <TooltipContent>

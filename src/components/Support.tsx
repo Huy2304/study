@@ -61,7 +61,10 @@ export default function Support() {
     }
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm">
+        <div 
+            className="fixed inset-0 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm"
+            style={{ zIndex: 330 }}
+        >
             <div className="relative w-full max-w-lg rounded-2xl bg-gray-900 border border-white/20 p-8 shadow-2xl">
                 {/* Nút đóng */}
                 <button

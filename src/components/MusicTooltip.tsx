@@ -56,10 +56,17 @@ export function MusicTooltip() {
     return (
         <Tooltip>
             <TooltipTrigger asChild>
-                <button className="flex items-center justify-center w-12 h-12 rounded-xl bg-white/10 hover:bg-white/20 backdrop-blur-xl border border-white/20 transition-all hover:scale-110 group">
-                    <Music size={22} className="text-white/70 group-hover:text-white transition" />
+                <button 
+                    className="flex items-center justify-center w-12 h-12 rounded-xl bg-white/10 hover:bg-white/20 backdrop-blur-xl border border-white/20 transition-all hover:scale-110 group focus:outline-none focus:ring-2 focus:ring-white/50 relative"
+                    aria-label={currentSound ? `Đang phát: ${currentSound}` : "Mở focus sounds"}
+                    aria-expanded={false}
+                >
+                    <Music size={22} className="text-white/70 group-hover:text-white transition" aria-hidden="true" />
                     {currentSound && (
-                        <span className="absolute -top-1 -right-1 w-3 h-3 bg-green-400 rounded-full animate-pulse" />
+                        <span 
+                            className="absolute -top-1 -right-1 w-3 h-3 bg-green-400 rounded-full animate-pulse"
+                            aria-label="Đang phát"
+                        />
                     )}
                 </button>
             </TooltipTrigger>

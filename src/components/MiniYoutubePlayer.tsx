@@ -47,19 +47,26 @@ export default function MiniYoutubePlayer() {
             {/* Nút nổi cố định góc dưới trái */}
             <button
                 onClick={togglePlayer}
-                className="flex items-center justify-center w-12 h-12 rounded-xl bg-white/10 hover:bg-white/20 backdrop-blur-xl border border-white/20 transition-all hover:scale-110 group relative"
+                className="flex items-center justify-center w-12 h-12 rounded-xl bg-white/10 hover:bg-white/20 backdrop-blur-xl border border-white/20 transition-all hover:scale-110 group relative focus:outline-none focus:ring-2 focus:ring-white/50"
+                aria-label={isMusicOn ? (isPlayerOpen ? "Đóng YouTube player" : "Mở YouTube player") : "Bật YouTube player"}
+                aria-expanded={isPlayerOpen}
             >
-                {isMusicOn && isPlayerOpen ? <X size={24} /> : <Radio size={24} />}
+                {isMusicOn && isPlayerOpen ? (
+                    <X size={24} aria-hidden="true" />
+                ) : (
+                    <Radio size={24} aria-hidden="true" />
+                )}
             </button>
 
             {/* Mini Player - chỉ render 1 lần khi bật nhạc */}
             {isMusicOn && (
                 <div
-                    className={`fixed left-5 bottom-24 z-[998] w-96 max-w-[92vw] transition-all duration-500 ease-out origin-bottom-left ${
+                    className={`fixed left-5 bottom-24 w-96 max-w-[92vw] transition-all duration-500 ease-out origin-bottom-left ${
                         isPlayerOpen
                             ? 'translate-y-0 opacity-100 scale-100'
                             : 'translate-y-8 opacity-0 scale-95 pointer-events-none'
                     }`}
+                    style={{ zIndex: 310 }}
                 >
                     <div className="bg-black/90 backdrop-blur-3xl rounded-2xl border border-white/20 shadow-2xl overflow-hidden">
                         {/* Header */}

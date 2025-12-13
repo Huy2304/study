@@ -1,7 +1,7 @@
 // components/Timer.tsx
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { Button } from "@/components/ui/button";
 import { useFocusMode } from "@/lib/FocusModeContext";
 import { ChevronDown, Plus, Settings } from "lucide-react";
@@ -73,10 +73,10 @@ export function CLockDown() {
         }
     }, [isRunning, timeLeft, duration]);
 
-    const toggleTimer = () => {
+    const toggleTimer = useCallback(() => {
         if (timeLeft === 0) setTimeLeft(duration);
-        setIsRunning(!isRunning);
-    };
+        setIsRunning(prev => !prev);
+    }, [timeLeft, duration]);
 
     // Hàm chung để set timer mới và close popup
     const setNewTimer = (seconds: number) => {
@@ -102,14 +102,16 @@ export function CLockDown() {
         setNewTimer(customSeconds);
     };
 
-    const format = (s: number) => {
+    const format = useCallback((s: number) => {
         const h = Math.floor(s / 3600);
         const m = Math.floor((s % 3600) / 60);
         const sec = s % 60;
         return h > 0
             ? `${h}:${m.toString().padStart(2, '0')}:${sec.toString().padStart(2, '0')}`
             : `${m.toString().padStart(2, '0')}:${sec.toString().padStart(2, '0')}`;
-    };
+    }, []);
+    
+    const formattedTime = useMemo(() => format(timeLeft), [format, timeLeft]);
 
     return (
         <div className="fixed inset-0 flex flex-col items-center justify-center pointer-events-none">
@@ -124,8 +126,11 @@ export function CLockDown() {
                             : "text-[16vw] sm:text-[11vw] md:text-[10vw] lg:text-[9vw]  xl:text-[8vw]  2xl:text-[7vw]"
                     }`}
                     style={{ textShadow: "0 0 80px rgba(255,255,255,0.5)", fontVariantNumeric: "tabular-nums" }}
+                    role="timer"
+                    aria-live="polite"
+                    aria-label={`Thời gian còn lại: ${formattedTime}`}
                 >
-                    {format(timeLeft)}
+                    {formattedTime}
                 </div>
 
                 {/* Nút Start/Pause + Nút mở popup */}
@@ -143,7 +148,8 @@ export function CLockDown() {
                     <Button
                         onClick={toggleTimer}
                         size="lg"
-                        className={`rounded-full px-24 py-8 text-3xl font-medium bg-white/15 backdrop-blur-xl border border-white/30 text-white hover:bg-white/25 active:scale-95 transition-all shadow-2xl ${isSuperFocus ? 'invisible' : ''}`}
+                        className={`rounded-full px-24 py-8 text-3xl font-medium bg-white/15 backdrop-blur-xl border border-white/30 text-white hover:bg-white/25 active:scale-95 transition-all shadow-2xl focus:outline-none focus:ring-2 focus:ring-white/50 ${isSuperFocus ? 'invisible' : ''}`}
+                        aria-label={timeLeft === 0 ? "Khởi động lại timer" : isRunning ? "Tạm dừng timer" : "Bắt đầu timer"}
                     >
                         {timeLeft === 0 ? "Restart" : isRunning ? "Pause" : "Start"}
                     </Button>
@@ -154,7 +160,8 @@ export function CLockDown() {
             {showSetup && !isSuperFocus && (
                 <div
                     ref={setupRef}
-                    className="fixed top-16 bottom-20 left-0 right-0 flex items-center justify-center z-[100] pointer-events-auto"
+                    className="fixed top-16 bottom-20 left-0 right-0 flex items-center justify-center pointer-events-auto"
+                    style={{ zIndex: 360 }}
 
                 >
                     <div className="relative bg-black/90 border border-white/20 rounded-2xl p-6 max-w-sm w-full mx-4 shadow-2xl overflow-y-auto max-h-[80vh] transition-all duration-300 scale-100 hover:scale-105"> {/* Thu nhỏ max-w-sm, p-6, thêm animation scale */}

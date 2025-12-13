@@ -39,7 +39,11 @@ const LANGUAGES = [
 
 type LangCode = typeof LANGUAGES[number]["code"]
 
-export default function TranslatePro() {
+interface TranslateProProps {
+    asIconButton?: boolean;
+}
+
+export default function TranslatePro({ asIconButton = false }: TranslateProProps) {
     const [open, setOpen] = React.useState(false)
     const [sourceLang, setSourceLang] = React.useState<LangCode>("auto")
     const [targetLang, setTargetLang] = React.useState<LangCode>("vi")
@@ -122,6 +126,179 @@ export default function TranslatePro() {
         textareaRef.current?.focus()
     }
 
+    // Icon button style (giống MusicTooltip, BackgroundChanger, Support)
+    if (asIconButton) {
+        return (
+            <>
+                <button
+                    onClick={() => setOpen(!open)}
+                    className="flex items-center justify-center w-12 h-12 rounded-xl bg-white/10 hover:bg-white/20 backdrop-blur-xl border border-white/20 transition-all hover:scale-110 group relative"
+                    title="Dịch nhanh"
+                >
+                    {open ? (
+                        <Languages size={22} className="text-white/70 group-hover:text-white transition" />
+                    ) : (
+                        <Globe size={22} className="text-white/70 group-hover:text-white transition" />
+                    )}
+                </button>
+
+                {/* Popup dịch */}
+                {open && (
+                    <>
+                        <div 
+                            className="fixed inset-0 bg-black/70 backdrop-blur-sm" 
+                            style={{ zIndex: 340 }}
+                            onClick={() => setOpen(false)}
+                            aria-label="Đóng dịch"
+                        />
+
+                        <Card
+                            className="fixed bottom-24 left-1/2 -translate-x-1/2 w-full max-w-3xl px-4
+                          bg-black/95 backdrop-blur-2xl border border-white/20 shadow-2xl
+                          animate-in slide-in-from-bottom-8 duration-300"
+                            style={{ zIndex: 341 }}
+                        >
+                            <CardContent className="p-4 space-y-5">
+                                {/* Header */}
+                                <div className="flex items-center justify-between">
+                                    <h3 className="font-semibold text-xl flex items-center gap-2 text-white/90">
+                                        <Globe className="h-6 w-6 text-blue-400" />
+                                        Dịch nhanh
+                                    </h3>
+                                    <Button
+                                        size="icon"
+                                        variant="ghost"
+                                        className="text-white/70 hover:text-white hover:bg-white/10"
+                                        onClick={() => setOpen(false)}
+                                    >
+                                        <X className="h-5 w-5" />
+                                    </Button>
+                                </div>
+
+                                {/* Chọn ngôn ngữ */}
+                                <div className="flex items-center gap-3">
+                                    <Select value={sourceLang} onValueChange={(v) => setSourceLang(v as LangCode)}>
+                                        <SelectTrigger className="w-36 bg-white/20 border-white/30 text-white/90">
+                                            <SelectValue />
+                                        </SelectTrigger>
+                                        <SelectContent className="bg-white/95 dark:bg-gray-900/95">
+                                            {LANGUAGES.map((lang) => (
+                                                <SelectItem key={lang.code} value={lang.code}>
+                                                    <span className="flex items-center gap-2">
+                                                        <span className="text-lg">{lang.flag}</span>
+                                                        <span className="text-sm">{lang.name}</span>
+                                                    </span>
+                                                </SelectItem>
+                                            ))}
+                                        </SelectContent>
+                                    </Select>
+
+                                    <Button
+                                        size="icon"
+                                        variant="outline"
+                                        className="bg-white/20 border-white/30 hover:bg-white/30"
+                                        onClick={swapLanguages}
+                                        disabled={sourceLang === "auto"}
+                                    >
+                                        <ArrowUpDown className="h-5 w-5 text-white/90" />
+                                    </Button>
+
+                                    <Select value={targetLang} onValueChange={(v) => setTargetLang(v as LangCode)}>
+                                        <SelectTrigger className="w-36 bg-white/20 border-white/30 text-white/90">
+                                            <SelectValue />
+                                        </SelectTrigger>
+                                        <SelectContent className="bg-white/95 dark:bg-gray-900/95">
+                                            {LANGUAGES.filter(l => l.code !== "auto").map((lang) => (
+                                                <SelectItem key={lang.code} value={lang.code}>
+                                                    <span className="flex items-center gap-2">
+                                                        <span className="text-lg">{lang.flag}</span>
+                                                        <span className="text-sm">{lang.name}</span>
+                                                    </span>
+                                                </SelectItem>
+                                            ))}
+                                        </SelectContent>
+                                    </Select>
+                                </div>
+
+                                {detectedLang && (
+                                    <p className="text-xs font-medium text-blue-300">{detectedLang}</p>
+                                )}
+
+                                {/* Input */}
+                                <div className="relative">
+                                    <Textarea
+                                        ref={textareaRef}
+                                        placeholder="Nhập văn bản cần dịch..."
+                                        value={input}
+                                        onChange={(e) => setInput(e.target.value)}
+                                        className="min-h-36 resize-none bg-white/15 border-white/25
+                                     text-white placeholder:text-white/50 focus:ring-2
+                                     focus:ring-blue-400/50 focus:border-blue-400
+                                     rounded-xl p-4"
+                                    />
+                                    {input && (
+                                        <Button
+                                            size="icon"
+                                            variant="ghost"
+                                            className="absolute top-2 right-2 text-white/70 hover:text-white hover:bg-white/20"
+                                            onClick={clearInput}
+                                        >
+                                            <Eraser className="h-5 w-5" />
+                                        </Button>
+                                    )}
+                                </div>
+
+                                {/* Output */}
+                                <div className="bg-white/15 rounded-xl p-5 min-h-36 max-h-48 overflow-y-auto">
+                                    {loading ? (
+                                        <p className="text-sm text-white/70 animate-pulse">Đang dịch...</p>
+                                    ) : output ? (
+                                        <>
+                                            <p className="text-base text-white/90 leading-relaxed">{output}</p>
+                                            <div className="flex gap-3 mt-3">
+                                                <Button
+                                                    size="sm"
+                                                    variant="secondary"
+                                                    className="bg-blue-500/30 hover:bg-blue-500/50 text-white"
+                                                    onClick={() => speak(output, targetLang)}
+                                                >
+                                                    <Volume2 className="h-4 w-4 mr-2" /> Nghe
+                                                </Button>
+                                                <Button
+                                                    size="sm"
+                                                    variant="secondary"
+                                                    className="bg-blue-500/30 hover:bg-blue-500/50 text-white"
+                                                    onClick={copy}
+                                                >
+                                                    {copied ? (
+                                                        <>
+                                                            <Check className="h-4 w-4 mr-2" /> Đã copy
+                                                        </>
+                                                    ) : (
+                                                        <>
+                                                            <Copy className="h-4 w-4 mr-2" /> Copy
+                                                        </>
+                                                    )}
+                                                </Button>
+                                            </div>
+                                        </>
+                                    ) : (
+                                        <p className="text-sm text-white/50 italic">Kết quả ...</p>
+                                    )}
+                                </div>
+
+                                <p className="text-xs text-center text-white/60">
+                                    Powered by Google Translate • Miễn phí
+                                </p>
+                            </CardContent>
+                        </Card>
+                    </>
+                )}
+            </>
+        );
+    }
+
+    // Original style (giữ nguyên cho backward compatibility)
     return (
         <>
             {/* Nút mở - to hơn, gradient đẹp */}

@@ -36,10 +36,17 @@ export default function BackgroundChanger() {
 
             {isOpen && (
                 <>
-                    <div className="fixed inset-0 bg-black/70 backdrop-blur-sm z-[998]"
-                         onClick={() => setIsOpen(false)}/>
+                    <div 
+                        className="fixed inset-0 bg-black/70 backdrop-blur-sm"
+                        style={{ zIndex: 320 }}
+                        onClick={() => setIsOpen(false)}
+                        aria-label="Đóng background changer"
+                    />
 
-                    <div className="fixed inset-x-0 bottom-24 left-1/2 -translate-x-1/2 z-[999] w-full max-w-3xl px-4">
+                    <div 
+                        className="fixed inset-x-0 bottom-24 left-1/2 -translate-x-1/2 w-full max-w-3xl px-4"
+                        style={{ zIndex: 321 }}
+                    >
                         <div className="bg-black/95 backdrop-blur-2xl rounded-3xl border border-white/20 shadow-2xl">
                             <div className="flex items-center justify-between p-4 border-b border-white/10">
                                 <h3 className="text-lg font-bold text-white">Chọn Background</h3>
