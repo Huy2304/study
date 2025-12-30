@@ -1,18 +1,8 @@
+// QuickMathGame.tsx - Full file, chữ nhỏ gọn dễ nhìn, ít scroll
 "use client";
-
-import { useState, useEffect, useCallback, useMemo, useRef } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import {
-    X,
-    Trophy,
-    RotateCcw,
-    Play,
-    HelpCircle,
-    Timer,
-    Flame,
-    Zap,
-    Infinity,
-} from "lucide-react";
+import { Trophy, RotateCcw, Play, Timer, Flame, Infinity } from "lucide-react";
 
 type GameMode = "timed" | "unlimited";
 type Difficulty = "easy" | "medium" | "hard";
@@ -24,33 +14,13 @@ interface MathProblem {
 }
 
 const DIFFICULTY_CONFIG = {
-    easy: {
-        timeLimit: 60,
-        minNum: 1,
-        maxNum: 20,
-        operations: ["+", "-"] as const,
-        pointsPerCorrect: 10,
-        color: "from-emerald-500 to-teal-600",
-    },
-    medium: {
-        timeLimit: 45,
-        minNum: 10,
-        maxNum: 50,
-        operations: ["+", "-", "*"] as const,
-        pointsPerCorrect: 20,
-        color: "from-blue-500 to-indigo-600",
-    },
-    hard: {
-        timeLimit: 30,
-        minNum: 20,
-        maxNum: 100,
-        operations: ["+", "-", "*", "/"] as const,
-        pointsPerCorrect: 30,
-        color: "from-purple-500 to-pink-600",
-    },
+    easy: { timeLimit: 60, pointsPerCorrect: 10 },
+    medium: { timeLimit: 45, pointsPerCorrect: 20 },
+    hard: { timeLimit: 30, pointsPerCorrect: 30 },
 };
 
 const UNLIMITED_QUESTION_COUNT = 20;
+const STORAGE_KEY = "quickmath_stats_v3";
 
 interface GameStats {
     totalPlays: number;
@@ -60,10 +30,7 @@ interface GameStats {
     bestUnlimitedTime?: number;
 }
 
-const STORAGE_KEY = "quickmath_stats_v3";
-
 export default function QuickMathGame({ embedded = false }: { embedded?: boolean }) {
-    const [isOpen, setIsOpen] = useState(embedded);
     const [gameMode, setGameMode] = useState<GameMode>("timed");
     const [difficulty, setDifficulty] = useState<Difficulty>("medium");
     const [currentProblem, setCurrentProblem] = useState<MathProblem | null>(null);
@@ -71,50 +38,37 @@ export default function QuickMathGame({ embedded = false }: { embedded?: boolean
     const [timeLeft, setTimeLeft] = useState(0);
     const [elapsedTime, setElapsedTime] = useState(0);
     const [streak, setStreak] = useState(0);
-    const [showHelp, setShowHelp] = useState(false);
     const [questionsAnswered, setQuestionsAnswered] = useState(0);
-    const [selectedOption, setSelectedOption] = useState<number | null>(null); // Theo dõi lựa chọn hiện tại
-    const [isCorrect, setIsCorrect] = useState<boolean | null>(null); // null: chưa chọn, true: đúng, false: sai
-
-    const [stats, setStats] = useState<GameStats>({
-        totalPlays: 0,
-        bestScore: 0,
-        correctAnswers: 0,
-        totalAnswers: 0,
-        bestUnlimitedTime: undefined,
-    });
+    const [selectedOption, setSelectedOption] = useState<number | null>(null);
+    const [isCorrect, setIsCorrect] = useState<boolean | null>(null);
+    const [stats, setStats] = useState<GameStats>({ totalPlays: 0, bestScore: 0, correctAnswers: 0, totalAnswers: 0 });
 
     const correctThisRound = useRef(0);
     const totalThisRound = useRef(0);
     const startTime = useRef<number>(0);
 
     useEffect(() => {
-        try {
-            const saved = localStorage.getItem(STORAGE_KEY);
-            if (saved) setStats(JSON.parse(saved));
-        } catch (e) {
-            console.warn("Failed to load stats");
-        }
+        const saved = localStorage.getItem(STORAGE_KEY);
+        // eslint-disable-next-line react-hooks/set-state-in-effect
+        if (saved) setStats(JSON.parse(saved));
     }, []);
 
     const saveStats = useCallback((newStats: GameStats) => {
-        try {
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(newStats));
-            setStats(newStats);
-        } catch (e) {
-            console.warn("Failed to save stats");
-        }
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(newStats));
+        setStats(newStats);
     }, []);
 
     const generateProblem = useCallback((diff: Difficulty): MathProblem => {
         const config = DIFFICULTY_CONFIG[diff];
+        const minNum = diff === "easy" ? 1 : diff === "medium" ? 10 : 20;
+        const maxNum = diff === "easy" ? 20 : diff === "medium" ? 50 : 100;
+        const operations = diff === "hard" ? ["+", "-", "*", "/"] : diff === "medium" ? ["+", "-", "*"] : ["+", "-"];
         let num1: number, num2: number, operation: string;
-        let question: string;
-        let answer: number;
+        let question: string = "";
+        let answer: number = 0;
 
         do {
-            operation = config.operations[Math.floor(Math.random() * config.operations.length)];
-
+            operation = operations[Math.floor(Math.random() * operations.length)];
             if (operation === "*") {
                 num1 = Math.floor(Math.random() * 12) + 1;
                 num2 = Math.floor(Math.random() * 12) + 1;
@@ -122,8 +76,8 @@ export default function QuickMathGame({ embedded = false }: { embedded?: boolean
                 num2 = Math.floor(Math.random() * 10) + 2;
                 num1 = num2 * (Math.floor(Math.random() * 10) + 1);
             } else {
-                num1 = Math.floor(Math.random() * (config.maxNum - config.minNum + 1)) + config.minNum;
-                num2 = Math.floor(Math.random() * (config.maxNum - config.minNum + 1)) + config.minNum;
+                num1 = Math.floor(Math.random() * (maxNum - minNum + 1)) + minNum;
+                num2 = Math.floor(Math.random() * (maxNum - minNum + 1)) + minNum;
                 if (operation === "-") [num1, num2] = [Math.max(num1, num2), Math.min(num1, num2)];
             }
 
@@ -132,7 +86,6 @@ export default function QuickMathGame({ embedded = false }: { embedded?: boolean
                 case "-": answer = num1 - num2; question = `${num1} - ${num2}`; break;
                 case "*": answer = num1 * num2; question = `${num1} × ${num2}`; break;
                 case "/": answer = num1 / num2; question = `${num1} ÷ ${num2}`; break;
-                default: answer = num1 + num2; question = `${num1} + ${num2}`;
             }
         } while (answer < 0 || !Number.isInteger(answer));
 
@@ -142,15 +95,10 @@ export default function QuickMathGame({ embedded = false }: { embedded?: boolean
             if (wrong > 0 && wrong !== answer) options.add(wrong);
         }
 
-        return {
-            question,
-            answer,
-            options: Array.from(options).sort(() => Math.random() - 0.5),
-        };
+        return { question, answer, options: Array.from(options).sort(() => Math.random() - 0.5) };
     }, []);
 
     const startGame = useCallback(() => {
-        const config = DIFFICULTY_CONFIG[difficulty];
         setScore(0);
         setStreak(0);
         setQuestionsAnswered(0);
@@ -160,10 +108,9 @@ export default function QuickMathGame({ embedded = false }: { embedded?: boolean
         totalThisRound.current = 0;
 
         if (gameMode === "timed") {
-            setTimeLeft(config.timeLimit);
+            setTimeLeft(DIFFICULTY_CONFIG[difficulty].timeLimit);
             setElapsedTime(0);
         } else {
-            setTimeLeft(0);
             setElapsedTime(0);
             startTime.current = Date.now();
         }
@@ -171,384 +118,152 @@ export default function QuickMathGame({ embedded = false }: { embedded?: boolean
         setCurrentProblem(generateProblem(difficulty));
     }, [difficulty, gameMode, generateProblem]);
 
-    const handleAnswer = useCallback(
-        (selected: number) => {
-            if (!currentProblem) return;
+    const handleAnswer = useCallback((selected: number) => {
+        if (!currentProblem) return;
+        setSelectedOption(selected);
+        const correct = selected === currentProblem.answer;
+        setIsCorrect(correct);
+        totalThisRound.current += 1;
 
-            setSelectedOption(selected);
-
-            const correct = selected === currentProblem.answer;
-            setIsCorrect(correct);
-
-            totalThisRound.current += 1; // Tăng mỗi lần click
-
-            if (correct) {
-                correctThisRound.current += 1;
-                const points = DIFFICULTY_CONFIG[difficulty].pointsPerCorrect + streak * 5;
-                setScore((prev) => prev + points);
-                setStreak((prev) => prev + 1);
-                setQuestionsAnswered((prev) => prev + 1);
-                setTimeout(() => {
-                    setCurrentProblem(generateProblem(difficulty));
-                    setSelectedOption(null);
-                    setIsCorrect(null);
-                }, 500); // Delay 0.5s để thấy animation trước khi chuyển câu
-            } else {
-                setStreak(0);
-                // Không chuyển câu, cho chọn lại
-            }
-        },
-        [currentProblem, difficulty, streak, generateProblem]
-    );
+        if (correct) {
+            correctThisRound.current += 1;
+            const points = DIFFICULTY_CONFIG[difficulty].pointsPerCorrect + streak * 5;
+            setScore(prev => prev + points);
+            setStreak(prev => prev + 1);
+            setQuestionsAnswered(prev => prev + 1);
+            setTimeout(() => {
+                setCurrentProblem(generateProblem(difficulty));
+                setSelectedOption(null);
+                setIsCorrect(null);
+            }, 600);
+        } else {
+            setStreak(0);
+        }
+    }, [currentProblem, difficulty, streak, generateProblem]);
 
     useEffect(() => {
-        if (gameMode === "timed" && timeLeft <= 0 && currentProblem) {
-            endGame();
-            return;
-        }
-
-        if (gameMode === "timed" && timeLeft > 0) {
-            const id = setInterval(() => setTimeLeft((t) => t - 1), 1000);
+        if (gameMode === "timed" && timeLeft > 0 && currentProblem) {
+            const id = setInterval(() => setTimeLeft(t => t - 1), 1000);
             return () => clearInterval(id);
         }
-
         if (gameMode === "unlimited" && currentProblem) {
-            const id = setInterval(() => {
-                setElapsedTime(Math.floor((Date.now() - startTime.current) / 1000));
-            }, 1000);
+            const id = setInterval(() => setElapsedTime(Math.floor((Date.now() - startTime.current) / 1000)), 1000);
             return () => clearInterval(id);
         }
     }, [gameMode, timeLeft, currentProblem]);
 
-    useEffect(() => {
-        if (gameMode === "unlimited" && questionsAnswered >= UNLIMITED_QUESTION_COUNT && currentProblem) {
-            endGame();
-        }
-    }, [questionsAnswered, gameMode, currentProblem]);
-
     const endGame = useCallback(() => {
         const newBestScore = Math.max(stats.bestScore, score);
         let newBestUnlimitedTime = stats.bestUnlimitedTime;
-
         if (gameMode === "unlimited" && correctThisRound.current === UNLIMITED_QUESTION_COUNT) {
             const timeTaken = elapsedTime;
-            if (!newBestUnlimitedTime || timeTaken < newBestUnlimitedTime) {
-                newBestUnlimitedTime = timeTaken;
-            }
+            if (!newBestUnlimitedTime || timeTaken < newBestUnlimitedTime) newBestUnlimitedTime = timeTaken;
         }
-
-        const updated: GameStats = {
+        saveStats({
             totalPlays: stats.totalPlays + 1,
             bestScore: newBestScore,
             correctAnswers: stats.correctAnswers + correctThisRound.current,
             totalAnswers: stats.totalAnswers + totalThisRound.current,
             bestUnlimitedTime: newBestUnlimitedTime,
-        };
-
-        saveStats(updated);
+        });
         setCurrentProblem(null);
     }, [stats, score, gameMode, elapsedTime, saveStats]);
 
-    const formatTime = (seconds: number) => {
-        const m = Math.floor(seconds / 60);
-        const s = seconds % 60;
-        return `${m}:${s.toString().padStart(2, "0")}`;
-    };
+    useEffect(() => {
+        if ((gameMode === "timed" && timeLeft <= 0) || (gameMode === "unlimited" && questionsAnswered >= UNLIMITED_QUESTION_COUNT)) endGame();
+    }, [timeLeft, questionsAnswered, gameMode, endGame]);
 
-    const accuracy = useMemo(
-        () => (stats.totalAnswers > 0 ? Math.round((stats.correctAnswers / stats.totalAnswers) * 100) : 0),
-        [stats]
-    );
-
+    const formatTime = (s: number) => `${Math.floor(s / 60)}:${(s % 60).toString().padStart(2, "0")}`;
     const isGameActive = !!currentProblem;
-    const isGameOver = (gameMode === "timed" && timeLeft <= 0) ||
-        (gameMode === "unlimited" && questionsAnswered >= UNLIMITED_QUESTION_COUNT);
-
-    if (!isOpen) return null;
+    const isGameOver = (gameMode === "timed" && timeLeft <= 0) || (gameMode === "unlimited" && questionsAnswered >= UNLIMITED_QUESTION_COUNT);
 
     return (
-        <div className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-            <motion.div
-                initial={{ scale: 0.9, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                className="bg-gray-900 rounded-2xl shadow-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto border border-gray-800"
-            >
-                <div className="p-6">
-                    {/* Header */}
-                    <div className="flex items-center justify-between mb-6">
-                        <div>
-                            <h2 className="text-2xl font-bold text-white flex items-center gap-3">
-                                <Zap className="text-yellow-400" size={32} />
-                                Quick Math Challenge
-                            </h2>
-                            <p className="text-gray-400 text-sm mt-1">Rèn luyện tốc độ và tư duy toán học</p>
-                        </div>
-                        <div className="flex gap-2">
-                            <button onClick={() => setShowHelp(!showHelp)} className="p-2 rounded-lg hover:bg-white/10">
-                                <HelpCircle className="text-gray-400" size={24} />
-                            </button>
-                            {!embedded && (
-                                <button onClick={() => setIsOpen(false)} className="p-2 rounded-lg hover:bg-white/10">
-                                    <X className="text-gray-400" size={24} />
-                                </button>
-                            )}
-                        </div>
-                    </div>
+        <div className="h-full w-full rounded-3xl bg-black/80 backdrop-blur-3xl flex flex-col overflow-hidden">
+            <div className="border-b border-cyan-500/30 bg-gradient-to-b from-cyan-500/20 to-transparent p-4">
+                <h2 className="text-2xl font-bold text-cyan-300 flex items-center gap-2">
+                    <motion.span animate={{ rotate: [0, 15, -15, 0] }} transition={{ repeat: Infinity, duration: 3 }}>⚡</motion.span>
+                    QUICK MATH
+                </h2>
+            </div>
 
-                    {/* Help Modal */}
-                    <AnimatePresence>
-                        {showHelp && (
-                            <motion.div
-                                initial={{ height: 0, opacity: 0 }}
-                                animate={{ height: "auto", opacity: 1 }}
-                                exit={{ height: 0, opacity: 0 }}
-                                className="mb-6 overflow-hidden"
-                            >
-                                <div className="bg-blue-500/20 border border-blue-500/50 rounded-xl p-5 text-gray-300 space-y-3">
-                                    <h3 className="text-xl font-bold text-white flex items-center gap-2">
-                                        <HelpCircle /> Hướng dẫn chơi
-                                    </h3>
-                                    <ul className="space-y-2 text-sm list-disc list-inside">
-                                        <li><strong>Có thời gian:</strong> Trả lời càng nhiều càng tốt trước khi hết giờ</li>
-                                        <li><strong>{UNLIMITED_QUESTION_COUNT} câu hỏi:</strong> Hoàn thành 20 câu nhanh nhất có thể</li>
-                                        <li>Nếu chọn sai, bạn có thể thử lại ngay trong cùng câu hỏi!</li>
-                                        <li>Trả lời đúng liên tiếp để nhận bonus combo (+5 điểm mỗi cấp)</li>
-                                    </ul>
-                                </div>
-                            </motion.div>
+            <div className="flex-1 p-4 overflow-y-auto">
+                {!isGameActive ? (
+                    <>
+                        {stats.totalPlays > 0 && (
+                            <div className="grid grid-cols-3 gap-3 mb-4">
+                                <div className="bg-white/10 rounded-xl p-3 text-center"><div className="text-lg font-bold text-cyan-300">{stats.bestScore}</div><div className="text-xs text-cyan-400">ĐIỂM CAO</div></div>
+                                <div className="bg-white/10 rounded-xl p-3 text-center"><div className="text-lg font-bold text-cyan-300">{stats.totalPlays}</div><div className="text-xs text-cyan-400">LẦN CHƠI</div></div>
+                                <div className="bg-white/10 rounded-xl p-3 text-center"><div className="text-lg font-bold text-cyan-300">{Math.round((stats.correctAnswers / stats.totalAnswers || 0) * 100)}%</div><div className="text-xs text-cyan-400">CHÍNH XÁC</div></div>
+                            </div>
                         )}
-                    </AnimatePresence>
 
-                    {/* Global Stats */}
-                    {stats.totalPlays > 0 && !isGameActive && (
-                        <div className="grid grid-cols-3 gap-3 mb-6">
-                            <div className="bg-white/10 rounded-xl p-4 text-center">
-                                <div className="text-2xl font-bold text-white">{stats.bestScore}</div>
-                                <div className="text-xs text-gray-400">Điểm cao nhất</div>
-                            </div>
-                            <div className="bg-white/10 rounded-xl p-4 text-center">
-                                <div className="text-2xl font-bold text-white">{stats.totalPlays}</div>
-                                <div className="text-xs text-gray-400">Lần chơi</div>
-                            </div>
-                            <div className="bg-white/10 rounded-xl p-4 text-center">
-                                <div className="text-2xl font-bold text-white">{accuracy}%</div>
-                                <div className="text-xs text-gray-400">Độ chính xác</div>
-                            </div>
-                        </div>
-                    )}
-
-                    {/* Selector */}
-                    {!isGameActive && (
-                        <div className="mb-8 space-y-6">
+                        <div className="space-y-4 mb-6">
                             <div>
-                                <label className="block text-gray-300 font-medium mb-3">Chế độ chơi</label>
+                                <h3 className="text-base font-bold text-cyan-300 mb-2">CHẾ ĐỘ</h3>
                                 <div className="grid grid-cols-2 gap-3">
-                                    <button
-                                        onClick={() => setGameMode("timed")}
-                                        className={`p-4 rounded-xl flex items-center justify-center gap-3 transition-all ${
-                                            gameMode === "timed"
-                                                ? "bg-gradient-to-r from-orange-500 to-red-600 text-white shadow-xl"
-                                                : "bg-white/10 text-gray-300 hover:bg-white/20"
-                                        }`}
-                                    >
-                                        <Timer size={20} />
-                                        Có giới hạn thời gian
-                                    </button>
-                                    <button
-                                        onClick={() => setGameMode("unlimited")}
-                                        className={`p-4 rounded-xl flex items-center justify-center gap-3 transition-all ${
-                                            gameMode === "unlimited"
-                                                ? "bg-gradient-to-r from-cyan-500 to-blue-600 text-white shadow-xl"
-                                                : "bg-white/10 text-gray-300 hover:bg-white/20"
-                                        }`}
-                                    >
-                                        <Infinity size={20} />
-                                        {UNLIMITED_QUESTION_COUNT} câu hỏi
-                                    </button>
+                                    <button onClick={() => setGameMode("timed")} className={`p-4 rounded-xl text-base font-bold ${gameMode === "timed" ? "bg-gradient-to-r from-orange-500 to-red-600 text-white" : "bg-white/10 text-cyan-300"}`}><Timer size={24} className="mx-auto mb-1" />THỜI GIAN</button>
+                                    <button onClick={() => setGameMode("unlimited")} className={`p-4 rounded-xl text-base font-bold ${gameMode === "unlimited" ? "bg-gradient-to-r from-cyan-500 to-blue-600 text-white" : "bg-white/10 text-cyan-300"}`}><Infinity size={24} className="mx-auto mb-1" />20 CÂU</button>
                                 </div>
                             </div>
 
                             <div>
-                                <label className="block text-gray-300 font-medium mb-3">Độ khó</label>
+                                <h3 className="text-base font-bold text-cyan-300 mb-2">ĐỘ KHÓ</h3>
                                 <div className="grid grid-cols-3 gap-3">
-                                    {(["easy", "medium", "hard"] as const).map((d) => {
-                                        const cfg = DIFFICULTY_CONFIG[d];
-                                        return (
-                                            <button
-                                                key={d}
-                                                onClick={() => setDifficulty(d)}
-                                                className={`p-4 rounded-xl transition-all ${
-                                                    difficulty === d
-                                                        ? `bg-gradient-to-r ${cfg.color} text-white shadow-xl scale-105`
-                                                        : "bg-white/10 text-gray-300 hover:bg-white/20"
-                                                }`}
-                                            >
-                                                <div className="font-bold capitalize">
-                                                    {d === "easy" ? "Dễ" : d === "medium" ? "Trung bình" : "Khó"}
-                                                </div>
-                                                {gameMode === "timed" && <div className="text-xs mt-1 opacity-80">{cfg.timeLimit}s</div>}
-                                            </button>
-                                        );
-                                    })}
+                                    {(["easy", "medium", "hard"] as const).map(d => (
+                                        <button key={d} onClick={() => setDifficulty(d)} className={`p-4 rounded-xl text-base font-bold ${difficulty === d ? "bg-gradient-to-r from-cyan-500 to-emerald-500 text-white" : "bg-white/10 text-cyan-300"}`}>
+                                            {d === "easy" ? "DỄ" : d === "medium" ? "TRUNG BÌNH" : "KHÓ"}
+                                        </button>
+                                    ))}
                                 </div>
                             </div>
                         </div>
-                    )}
 
-                    {/* In-game Stats */}
-                    {isGameActive && !isGameOver && (
-                        <>
-                            <div className="grid grid-cols-3 gap-3 mb-6">
-                                <div className="bg-white/10 rounded-xl p-4 text-center">
-                                    <div className="text-3xl font-bold text-white">{score}</div>
-                                    <div className="text-xs text-gray-400">Điểm</div>
-                                </div>
-                                <div className="bg-white/10 rounded-xl p-4 text-center">
-                                    <div className="text-3xl font-bold text-white flex items-center justify-center gap-1">
-                                        {gameMode === "timed" ? <Timer size={24} /> : <Infinity size={24} />}
-                                        {gameMode === "timed" ? `${timeLeft}s` : formatTime(elapsedTime)}
-                                    </div>
-                                    <div className="text-xs text-gray-400">
-                                        {gameMode === "timed" ? "Còn lại" : "Đã chơi"}
-                                    </div>
-                                </div>
-                                <div className="bg-white/10 rounded-xl p-4 text-center">
-                                    <div className="text-3xl font-bold text-white flex items-center justify-center gap-1">
-                                        {streak > 0 && <Flame className="text-orange-400" size={24} />}
-                                        {streak}
-                                    </div>
-                                    <div className="text-xs text-gray-400">Combo</div>
-                                </div>
-                            </div>
+                        <button onClick={startGame} className="w-full py-4 rounded-xl bg-gradient-to-r from-green-500 to-emerald-500 text-white text-lg font-bold flex items-center justify-center gap-3">
+                            <Play size={28} /> BẮT ĐẦU
+                        </button>
+                    </>
+                ) : !isGameOver ? (
+                    <>
+                        <div className="grid grid-cols-3 gap-3 mb-4">
+                            <div className="bg-white/10 rounded-xl p-3 text-center"><div className="text-2xl font-bold text-cyan-300">{score}</div><div className="text-xs text-cyan-400">ĐIỂM</div></div>
+                            <div className="bg-white/10 rounded-xl p-3 text-center"><div className="text-2xl font-bold text-cyan-300">{gameMode === "timed" ? timeLeft : formatTime(elapsedTime)}</div><div className="text-xs text-cyan-400">{gameMode === "timed" ? "GIÂY" : "THỜI GIAN"}</div></div>
+                            <div className="bg-white/10 rounded-xl p-3 text-center flex items-center justify-center gap-2">{streak > 0 && <Flame size={24} className="text-orange-400" />} <div className="text-2xl font-bold text-cyan-300">{streak}</div><div className="text-xs text-cyan-400">COMBO</div></div>
+                        </div>
 
-                            {gameMode === "unlimited" && (
-                                <div className="text-center text-gray-400 mb-4 font-medium">
-                                    Câu {questionsAnswered} / {UNLIMITED_QUESTION_COUNT}
-                                </div>
-                            )}
+                        <motion.div key={currentProblem?.question} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="mb-4">
+                            <div className="bg-white/10 rounded-2xl p-5 text-center"><h3 className="text-3xl font-bold text-white">{currentProblem?.question} = ?</h3></div>
+                        </motion.div>
 
-                            {gameMode === "timed" && (
-                                <div className="h-3 bg-gray-800 rounded-full overflow-hidden mb-6">
-                                    <motion.div
-                                        className="h-full bg-gradient-to-r from-green-500 via-yellow-500 to-red-500"
-                                        animate={{ width: `${(timeLeft / DIFFICULTY_CONFIG[difficulty].timeLimit) * 100}%` }}
-                                        transition={{ ease: "linear", duration: 0.8 }}
-                                    />
-                                </div>
-                            )}
-                        </>
-                    )}
+                        <div className="grid grid-cols-2 gap-3">
+                            {currentProblem?.options.map(opt => {
+                                const sel = selectedOption === opt;
+                                const correct = isCorrect && sel;
+                                const wrong = isCorrect === false && sel;
+                                return (
+                                    <motion.button
+                                        key={opt}
+                                        whileHover={{ scale: 1.03 }}
+                                        whileTap={{ scale: 0.97 }}
+                                        onClick={() => handleAnswer(opt)}
+                                        className={`py-5 text-2xl font-bold rounded-2xl text-white ${correct ? "bg-gradient-to-r from-green-500 to-emerald-500" : wrong ? "bg-red-600" : sel ? "bg-purple-600" : "bg-gradient-to-r from-cyan-600 to-indigo-600"}`}
+                                    >
+                                        {opt}
+                                    </motion.button>
+                                );
+                            })}
+                        </div>
 
-                    {/* Problem */}
-                    <AnimatePresence mode="wait">
-                        {isGameActive && !isGameOver && currentProblem && (
-                            <motion.div
-                                key={currentProblem.question}
-                                initial={{ opacity: 0, y: 20 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                exit={{ opacity: 0, y: -20 }}
-                                className="mb-8"
-                            >
-                                <div className="bg-white/10 rounded-2xl p-10 text-center mb-8">
-                                    <h3 className="text-5xl font-black text-white">
-                                        {currentProblem.question} = ?
-                                    </h3>
-                                </div>
-
-                                <div className="grid grid-cols-2 gap-4">
-                                    {currentProblem.options.map((opt, i) => {
-                                        const isSelected = selectedOption === opt;
-                                        const buttonClass = `
-                      text-white text-3xl font-bold py-6 rounded-2xl shadow-xl transition-all
-                      ${isSelected
-                                            ? (isCorrect === true
-                                                ? "bg-green-500 scale-105"
-                                                : isCorrect === false
-                                                    ? "bg-red-500 animate-shake"
-                                                    : "bg-indigo-600")
-                                            : "bg-indigo-600 hover:bg-indigo-500"
-                                        }
-                    `;
-
-                                        return (
-                                            <motion.button
-                                                key={i}
-                                                whileHover={{ scale: 1.05 }}
-                                                whileTap={{ scale: 0.95 }}
-                                                onClick={() => handleAnswer(opt)}
-                                                className={buttonClass}
-                                            >
-                                                {opt}
-                                            </motion.button>
-                                        );
-                                    })}
-                                </div>
-                            </motion.div>
-                        )}
-                    </AnimatePresence>
-
-                    {/* Game Over */}
-                    <AnimatePresence>
-                        {isGameOver && (
-                            <motion.div
-                                initial={{ scale: 0.8, opacity: 0 }}
-                                animate={{ scale: 1, opacity: 1 }}
-                                className="text-center mb-8 py-8"
-                            >
-                                <Trophy className="w-24 h-24 text-yellow-400 mx-auto mb-6" />
-                                <h3 className="text-3xl font-bold text-white mb-4">
-                                    {gameMode === "timed" ? "Hết giờ!" : "Hoàn thành!"}
-                                </h3>
-                                <p className="text-5xl font-black text-yellow-400 mb-6">{score} điểm</p>
-
-                                <div className="grid grid-cols-2 gap-4 mb-6">
-                                    <div className="bg-white/10 rounded-xl p-4">
-                                        <div className="text-gray-400 text-sm">Số câu đúng</div>
-                                        <div className="text-3xl font-bold text-green-400">
-                                            {correctThisRound.current} / {gameMode === "timed" ? totalThisRound.current : UNLIMITED_QUESTION_COUNT}
-                                        </div>
-                                    </div>
-                                    <div className="bg-white/10 rounded-xl p-4">
-                                        <div className="text-gray-400 text-sm">
-                                            {gameMode === "timed" ? "Combo cao nhất" : "Thời gian hoàn thành"}
-                                        </div>
-                                        <div className="text-3xl font-bold text-white">
-                                            {gameMode === "timed" ? streak : formatTime(elapsedTime)}
-                                        </div>
-                                    </div>
-                                </div>
-
-                                {gameMode === "unlimited" && correctThisRound.current === UNLIMITED_QUESTION_COUNT && stats.bestUnlimitedTime !== undefined && (
-                                    <p className="text-sm text-cyan-400 mb-4">
-                                        Kỷ lục nhanh nhất: <span className="font-bold">{formatTime(stats.bestUnlimitedTime)}</span>
-                                    </p>
-                                )}
-                            </motion.div>
-                        )}
-                    </AnimatePresence>
-
-                    {/* Action Buttons */}
-                    <div className="flex gap-4">
-                        {isGameActive && !isGameOver ? (
-                            <button
-                                onClick={endGame}
-                                className="flex-1 bg-red-600/80 hover:bg-red-700 text-white font-bold py-4 rounded-xl flex items-center justify-center gap-3 transition-all"
-                            >
-                                <RotateCcw size={24} />
-                                Dừng chơi
-                            </button>
-                        ) : (
-                            <button
-                                onClick={startGame}
-                                className="flex-1 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white font-bold py-4 rounded-xl shadow-xl flex items-center justify-center gap-3 transition-all"
-                            >
-                                <Play size={24} />
-                                {isGameOver ? "Chơi lại" : "Bắt đầu chơi"}
-                            </button>
-                        )}
+                        <button onClick={endGame} className="mt-6 w-full py-3 rounded-xl bg-red-600/80 text-white text-base font-bold">DỪNG CHƠI</button>
+                    </>
+                ) : (
+                    <div className="text-center py-6">
+                        <Trophy size={70} className="text-yellow-400 mx-auto mb-4" />
+                        <h3 className="text-2xl font-bold text-white mb-2">{gameMode === "timed" ? "HẾT GIỜ!" : "HOÀN THÀNH!"}</h3>
+                        <p className="text-4xl font-bold text-yellow-400 mb-6">{score} ĐIỂM</p>
+                        <button onClick={startGame} className="py-4 px-8 rounded-xl bg-gradient-to-r from-green-500 to-emerald-500 text-white text-xl font-bold">CHƠI LẠI</button>
                     </div>
-                </div>
-            </motion.div>
+                )}
+            </div>
         </div>
     );
 }
