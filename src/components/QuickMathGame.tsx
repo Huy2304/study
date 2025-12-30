@@ -49,7 +49,6 @@ export default function QuickMathGame({ embedded = false }: { embedded?: boolean
 
     useEffect(() => {
         const saved = localStorage.getItem(STORAGE_KEY);
-        // eslint-disable-next-line react-hooks/set-state-in-effect
         if (saved) setStats(JSON.parse(saved));
     }, []);
 
@@ -181,7 +180,12 @@ export default function QuickMathGame({ embedded = false }: { embedded?: boolean
         <div className="h-full w-full rounded-3xl bg-black/80 backdrop-blur-3xl flex flex-col overflow-hidden">
             <div className="border-b border-cyan-500/30 bg-gradient-to-b from-cyan-500/20 to-transparent p-4">
                 <h2 className="text-2xl font-bold text-cyan-300 flex items-center gap-2">
-                    <motion.span animate={{ rotate: [0, 15, -15, 0] }} transition={{ repeat: Infinity, duration: 3 }}>⚡</motion.span>
+                    <motion.span
+                        animate={{ rotate: [0, 15, -15, 0] }}
+                        transition={{ repeat: 999999, duration: 3 }}
+                    >
+                        ⚡
+                    </motion.span>
                     QUICK MATH
                 </h2>
             </div>
