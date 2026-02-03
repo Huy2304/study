@@ -6,6 +6,7 @@ import { FocusModeProvider } from "@/lib/FocusModeContext";
 import { BackgroundProvider, useBackground } from "@/lib/BackgroundContext";
 import { Analytics } from "@vercel/analytics/next";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
+import { FruitProvider } from "@/contexts/FruitContext";
 
 // Component con để render background từ Context
 function DynamicBackground() {
@@ -78,21 +79,23 @@ function DynamicBackground() {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
     return (
         <html lang="en" className="h-full">
-        <body className="h-full bg-black text-white antialiased">
-        <BackgroundProvider>        {/* ĐÚNG TÊN */}
-            <DynamicBackground />    {/* DÙNG BACKGROUND TỪ CONTEXT */}
-            <main className="relative flex min-h-screen flex-col">
-                <ErrorBoundary>
-                    <FocusModeProvider>
-                        <TooltipProvider>
-                            {children}
-                            <Analytics />
-                        </TooltipProvider>
-                    </FocusModeProvider>
-                </ErrorBoundary>
-            </main>
-        </BackgroundProvider>
-        </body>
+            <body className="h-full bg-black text-white antialiased">
+                <BackgroundProvider>        {/* ĐÚNG TÊN */}
+                    <DynamicBackground />    {/* DÙNG BACKGROUND TỪ CONTEXT */}
+                    <main className="relative flex min-h-screen flex-col">
+                        <ErrorBoundary>
+                            <FocusModeProvider>
+                                <FruitProvider>
+                                    <TooltipProvider>
+                                        {children}
+                                        <Analytics />
+                                    </TooltipProvider>
+                                </FruitProvider>
+                            </FocusModeProvider>
+                        </ErrorBoundary>
+                    </main>
+                </BackgroundProvider>
+            </body>
         </html>
     );
 }

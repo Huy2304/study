@@ -1,11 +1,10 @@
 "use client"
 import { useState, useEffect, useMemo, useCallback } from 'react';
-import {LampDesk, Calendar, Book} from "lucide-react";
+import { LampDesk, Calendar, Book } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import TodoList from "@/components/TodoList";
-import {useFocusMode} from "@/lib/FocusModeContext";
+import { useFocusMode } from "@/lib/FocusModeContext";
 import UserPanel from "@/components/UserPanel";
-import {RoomMeet} from "@/components/room/RoomMeet";
 
 
 export default function HeaderBar() {
@@ -38,13 +37,13 @@ export default function HeaderBar() {
     }, []);
 
     const { date, time } = useMemo(() => formatDateTime(now), [formatDateTime, now]);
-    
+
     const toggleTodoList = useCallback(() => {
         setShowTodoList(prev => !prev);
     }, []);
 
     return (
-        <div 
+        <div
             className={`fixed inset-x-0 top-0 ${isSuperFocus ? 'hidden' : ''}`}
             style={{ zIndex: 50 }}
         >
@@ -63,7 +62,7 @@ export default function HeaderBar() {
                 {/* Center: Room Info + ĐỒNG HỒ + Controls */}
                 <div className="flex items-center gap-4 sm:gap-6 text-white/80">
                     {/* ĐỒNG HỒ THỰC + NGÀY THÁNG */}
-                    <div 
+                    <div
                         className="flex items-center gap-2 bg-white/10 backdrop-blur-xl px-3 sm:px-4 py-2 rounded-full border border-white/20"
                         role="timer"
                         aria-live="polite"
@@ -120,7 +119,6 @@ export default function HeaderBar() {
                     {/*    </TooltipTrigger>*/}
                     {/*    <TooltipContent>More options</TooltipContent>*/}
                     {/*</Tooltip>*/}
-                    {/*/!*<RoomMeet/>*!/ Đang phát triển*/}
                     <UserPanel />
                 </div>
             </div>
