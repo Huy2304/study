@@ -6,7 +6,7 @@ import { FocusModeProvider } from "@/lib/FocusModeContext";
 import { BackgroundProvider, useBackground } from "@/lib/BackgroundContext";
 import { Analytics } from "@vercel/analytics/next";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
-import { FruitProvider } from "@/contexts/FruitContext";
+import { NongsanProvider } from "@/app/nongsan/contexts/FruitContext";
 
 // Component con để render background từ Context
 function DynamicBackground() {
@@ -85,12 +85,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                     <main className="relative flex min-h-screen flex-col">
                         <ErrorBoundary>
                             <FocusModeProvider>
-                                <FruitProvider>
+                                <NongsanProvider>
                                     <TooltipProvider>
                                         {children}
                                         <Analytics />
                                     </TooltipProvider>
-                                </FruitProvider>
+                                </NongsanProvider>
                             </FocusModeProvider>
                         </ErrorBoundary>
                     </main>
