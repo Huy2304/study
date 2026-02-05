@@ -7,12 +7,12 @@ import { Fruit } from "@/lib/fruit-data";
 export async function getFruits(): Promise<Fruit[]> {
     const supabase = await createClient();
     const { data, error } = await supabase
-        .from("fruits")
+        .from("nongsan")
         .select("*")
         .order("created_at", { ascending: false }); // hoặc id desc
 
     if (error) {
-        console.error("Error fetching fruits:", error);
+        console.error("Error fetching nongsan:", error);
         return [];
     }
     return data || [];
@@ -21,7 +21,7 @@ export async function getFruits(): Promise<Fruit[]> {
 export async function addFruit(fruit: Omit<Fruit, "id">): Promise<Fruit | null> {
     const supabase = await createClient();
     const { data, error } = await supabase
-        .from("fruits")
+        .from("nongsan")
         .insert({
             name: fruit.name,
             type: fruit.type,
@@ -44,7 +44,7 @@ export async function addFruit(fruit: Omit<Fruit, "id">): Promise<Fruit | null> 
 export async function updateFruit(fruit: Fruit): Promise<Fruit | null> {
     const supabase = await createClient();
     const { data, error } = await supabase
-        .from("fruits")
+        .from("nongsan")
         .update({
             name: fruit.name,
             type: fruit.type,
@@ -67,7 +67,7 @@ export async function updateFruit(fruit: Fruit): Promise<Fruit | null> {
 
 export async function deleteFruit(id: number): Promise<boolean> {
     const supabase = await createClient();
-    const { error } = await supabase.from("fruits").delete().eq("id", id);
+    const { error } = await supabase.from("nongsan").delete().eq("id", id);
 
     if (error) {
         console.error("Delete fruit error:", error);
