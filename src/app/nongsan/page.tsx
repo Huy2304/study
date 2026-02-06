@@ -3,6 +3,7 @@
 import HeaderBar from "@/components/HeaderBar";
 import { NongsanList } from "@/app/nongsan/components/NongSanList";
 import { useNongsan } from "@/app/nongsan/contexts/FruitContext";
+import ContactInfo from "./components/ContactInfo";
 
 export default function NongSanPage() {
   const { loading } = useNongsan();
@@ -10,7 +11,6 @@ export default function NongSanPage() {
   return (
     <>
       <div className="pt-24 space-y-8">
-        {/* Header */}
         <div>
           <h1 className="text-3xl font-bold">
             Danh sách Nông sản
@@ -30,6 +30,7 @@ export default function NongSanPage() {
             <NongsanList />
           )}
         </div>
+        <ContactInfo />
       </div>
     </>
   );
