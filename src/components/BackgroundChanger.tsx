@@ -1,8 +1,9 @@
 // components/BackgroundChanger.tsx
 'use client';
 
+import Image from "next/image";
 import { useState } from "react";
-import { X } from "lucide-react";
+import { ImageIcon, X } from "lucide-react";
 import { useBackground } from "@/lib/BackgroundContext";
 
 
@@ -18,13 +19,7 @@ export default function BackgroundChanger() {
                 className="flex items-center justify-center w-12 h-12 rounded-xl bg-white/10 hover:bg-white/20 backdrop-blur-xl border border-white/20 transition-all hover:scale-110 group relative"
                 title="Đổi background"
             >
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
-                     stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                     className="lucide lucide-image-icon lucide-image">
-                    <rect width="18" height="18" x="3" y="3" rx="2" ry="2"/>
-                    <circle cx="9" cy="9" r="2"/>
-                    <path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/>
-                </svg>
+                <ImageIcon size={24} aria-hidden="true" />
             </button>
 
             {isOpen && (
@@ -56,15 +51,17 @@ export default function BackgroundChanger() {
                                             setCurrentBg(bg.url);
                                             setIsOpen(false);
                                         }}
-                                        className="group relative overflow-hidden rounded-xl border border-white/10 text-left transition hover:border-white/35 focus:outline-none focus-visible:ring-2 focus-visible:ring-purple-300"
+                                        className="group relative h-24 overflow-hidden rounded-xl border border-white/10 text-left transition hover:border-white/35 focus:outline-none focus-visible:ring-2 focus-visible:ring-purple-300"
                                     >
-                                        <img
+                                        <Image
                                             src={bg.url}
                                             alt={bg.name}
-                                            loading="lazy"
-                                            decoding="async"
-                                            className="h-24 w-full object-cover transition-transform duration-300 group-hover:scale-105"
-                                        />                                        <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" />
+                                            fill
+                                            sizes="(min-width: 640px) 180px, 30vw"
+                                            unoptimized={bg.url.endsWith(".gif")}
+                                            className="object-cover transition-transform duration-300 group-hover:scale-105"
+                                        />
+                                        <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" />
                                         <p className="absolute bottom-1 left-1 text-xs font-medium text-white">{bg.name}</p>
                                         {currentBg === bg.url && (
                                             <div className="absolute top-2 right-2 w-3 h-3 bg-purple-500 rounded-full animate-pulse" />

@@ -120,3 +120,46 @@
     @apply bg-background text-foreground;
   }
 }
+
+@media (max-height: 700px) {
+  .focus-timer-layout {
+    transform: scale(0.9);
+    transform-origin: center;
+  }
+}
+
+@media (max-height: 600px) {
+  .focus-timer-layout {
+    transform: scale(0.78);
+  }
+}
+
+.calendar-flip-card {
+  perspective: 500px;
+}
+
+.calendar-flip-page {
+  backface-visibility: hidden;
+  transform-origin: bottom center;
+  animation: calendar-page-turn 440ms cubic-bezier(0.2, 0.8, 0.25, 1);
+}
+
+@keyframes calendar-page-turn {
+  0% {
+    opacity: 0.35;
+    transform: rotateX(-92deg);
+  }
+  60% {
+    opacity: 1;
+    transform: rotateX(8deg);
+  }
+  100% {
+    transform: rotateX(0deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .calendar-flip-page {
+    animation: none;
+  }
+}
