@@ -5,6 +5,8 @@ import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { Button } from "@/components/ui/button";
 import { useFocusMode } from "@/lib/FocusModeContext";
 import { ChevronDown, Plus, Settings } from "lucide-react";
+import TodayDashboard from "@/components/TodayDashboard";
+import { recordFocusSession } from "@/lib/daily-progress";
 
 const presets = [
     { name: "Deep Work", work: 90, short: 15, long: 45 },
@@ -23,6 +25,10 @@ export function CLockDown() {
     const [customMinutes, setCustomMinutes] = useState(1); // Default 1 phút để tránh alert 0
     const { isSuperFocus } = useFocusMode();
     const setupRef = useRef<HTMLDivElement>(null);
+    const hasStartedRef = useRef(false);
+    const completionRecordedRef = useRef(false);
+    const timeLeftRef = useRef(timeLeft);
+    const [completionMessage, setCompletionMessage] = useState("");
 
     useEffect(() => {
         const handleClickOutside = (e: MouseEvent) => {
@@ -36,9 +42,13 @@ export function CLockDown() {
         }
     }, [showSetup]);
 
+    useEffect(() => {
+        timeLeftRef.current = timeLeft;
+    }, [timeLeft]);
+
 // TIMER SIÊU MƯỢT + HIỂN THỊ REALTIME TRÊN TAB TITLE
     useEffect(() => {
-        if (!isRunning || timeLeft <= 0) return;
+        if (!isRunning || timeLeftRef.current <= 0) return;
 
         const intervalId = setInterval(() => {
             setTimeLeft(prev => {
@@ -73,10 +83,47 @@ export function CLockDown() {
         }
     }, [isRunning, timeLeft, duration]);
 
+    useEffect(() => {
+        if (
+            timeLeft !== 0 ||
+            !isRunning ||
+            !hasStartedRef.current ||
+            completionRecordedRef.current
+        ) {
+            return;
+        }
+
+        const completionTimer = window.setTimeout(() => {
+            completionRecordedRef.current = true;
+            setIsRunning(false);
+            recordFocusSession(duration);
+            setCompletionMessage(
+                `Đã hoàn thành phiên tập trung ${Math.round(
+                    duration / 60
+                )} phút.`
+            );
+        }, 0);
+
+        return () => window.clearTimeout(completionTimer);
+    }, [duration, isRunning, timeLeft]);
+
     const toggleTimer = useCallback(() => {
-        if (timeLeft === 0) setTimeLeft(duration);
+        if (timeLeft === 0) {
+            completionRecordedRef.current = false;
+            hasStartedRef.current = true;
+            setCompletionMessage("");
+            setTimeLeft(duration);
+            setIsRunning(true);
+            return;
+        }
+
+        if (!isRunning) {
+            hasStartedRef.current = true;
+            setCompletionMessage("");
+        }
+
         setIsRunning(prev => !prev);
-    }, [timeLeft, duration]);
+    }, [duration, isRunning, timeLeft]);
 
     // Hàm chung để set timer mới và close popup
     const setNewTimer = (seconds: number) => {
@@ -91,6 +138,9 @@ export function CLockDown() {
         setShowSetup(false);
         setCustomHours(0);
         setCustomMinutes(1); // Reset default
+        hasStartedRef.current = false;
+        completionRecordedRef.current = false;
+        setCompletionMessage("");
     };
 
     const applyCustomTimer = () => {
@@ -115,11 +165,12 @@ export function CLockDown() {
 
     return (
         <div className="fixed inset-0 flex flex-col items-center justify-center pointer-events-none">
-            <div className="pointer-events-auto flex flex-col items-center space-y-16">
+            <div className="pointer-events-auto flex flex-col items-center space-y-10 sm:space-y-14">
                 {/* Đồng hồ chính */}
-                <div
+                <button
+                    type="button"
                     onClick={toggleTimer}
-                    className={`select-none cursor-pointer font-bold tracking-wider text-white leading-none drop-shadow-2xl transition-all duration-700
+                    className={`select-none cursor-pointer border-0 bg-transparent p-0 font-bold tracking-wider text-white leading-none drop-shadow-2xl transition-all duration-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-white/80 focus-visible:ring-offset-8 focus-visible:ring-offset-transparent
             ${
                         isSuperFocus
                             ? "text-[18vw] sm:text-[16vw] md:text-[14vw] lg:text-[12vw] xl:text-[10vw] 2xl:text-[9vw]"
@@ -127,18 +178,21 @@ export function CLockDown() {
                     }`}
                     style={{ textShadow: "0 0 80px rgba(255,255,255,0.5)", fontVariantNumeric: "tabular-nums" }}
                     role="timer"
-                    aria-live="polite"
-                    aria-label={`Thời gian còn lại: ${formattedTime}`}
+                    aria-label={`${isRunning ? "Tạm dừng" : "Bắt đầu"} phiên tập trung. Thời gian còn lại ${formattedTime}`}
                 >
                     {formattedTime}
-                </div>
+                </button>
+
+                <p className="sr-only" role="status" aria-live="polite">
+                    {completionMessage}
+                </p>
 
                 {/* Nút Start/Pause + Nút mở popup */}
                 <div className="flex flex-col items-center gap-8">
                     {!isSuperFocus && (
                         <button
                             onClick={() => setShowSetup(!showSetup)}
-                            className="flex items-center gap-3 text-white/60 hover:text-white/90 transition text-lg font-medium"
+                            className="flex min-h-11 items-center gap-3 rounded-xl px-3 text-lg font-medium text-white/60 transition hover:bg-black/20 hover:text-white/90 focus:outline-none focus-visible:ring-2 focus-visible:ring-white/70"
                         >
                             <Settings size={22} />
                             <span>Setup Timer</span>
@@ -154,6 +208,8 @@ export function CLockDown() {
                         {timeLeft === 0 ? "Restart" : isRunning ? "Pause" : "Start"}
                     </Button>
                 </div>
+
+                {!isSuperFocus && <TodayDashboard />}
             </div>
 
             {/* Popup Setup Timer - Chỉnh để không đè header/bottom, thu nhỏ, và UX tốt hơn */}

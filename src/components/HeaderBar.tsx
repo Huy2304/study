@@ -53,9 +53,9 @@ export default function HeaderBar() {
                 <div className="flex items-center gap-3">
                     <div className="flex items-center gap-2">
                         <LampDesk size={28} className="text-yellow-400 drop-shadow-lg" />
-                        <span className="text-2xl font-bold text-white tracking-tight">
+                        <h1 className="text-2xl font-bold text-white tracking-tight">
                             StudyHay
-                        </span>
+                        </h1>
                     </div>
                 </div>
 
@@ -65,12 +65,11 @@ export default function HeaderBar() {
                     <div
                         className="flex items-center gap-2 bg-white/10 backdrop-blur-xl px-3 sm:px-4 py-2 rounded-full border border-white/20"
                         role="timer"
-                        aria-live="polite"
                         aria-label={`Ngày ${date}, giờ ${time}`}
                     >
                         <Calendar size={16} className="text-white/70 flex-shrink-0" aria-hidden="true" />
                         <div className="text-right min-w-0">
-                            <div className="text-xs text-white/70 leading-tight truncate">{date}</div>
+                            <div className="hidden text-xs leading-tight text-white/70 sm:block">{date}</div>
                             <div className="text-base sm:text-lg font-mono text-white tracking-wider">{time}</div>
                         </div>
                     </div>
@@ -82,7 +81,7 @@ export default function HeaderBar() {
                         <TooltipTrigger asChild>
                             <button
                                 onClick={toggleTodoList}
-                                className="relative p-2.5 rounded-lg hover:bg-white/10 transition focus:outline-none focus:ring-2 focus:ring-white/50"
+                                className="relative flex h-11 w-11 items-center justify-center rounded-lg transition hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-white/50"
                                 aria-label={showTodoList ? 'Ẩn Todo List' : 'Hiện Todo List'}
                                 aria-expanded={showTodoList}
                             >

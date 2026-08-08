@@ -5,18 +5,11 @@ import { useState } from "react";
 import { X } from "lucide-react";
 import { useBackground } from "@/lib/BackgroundContext";
 
-const backgrounds = [
-    { url: "/images/thumb.jpg", name: "Study Room" },
-    { url: "/images/1.jpg", name: "Rainy Window" },
-    { url: "/images/2.jpg", name: "Cozy Library" },
-    { url: "/images/3.jpg", name: "Night City" },
-    { url: "/images/4.jpg", name: "Forest Cabin" },
-    { url: "/images/forest.gif", name: "Ocean Sunset" },
-];
 
 export default function BackgroundChanger() {
     const [isOpen, setIsOpen] = useState(false);
-    const { setCurrentBg, currentBg } = useBackground(); // LẤY TỪ CONTEXT
+    const { backgrounds, currentBg, setCurrentBg } =
+        useBackground();
 
     return (
         <>
@@ -59,15 +52,19 @@ export default function BackgroundChanger() {
                                 {backgrounds.map((bg) => (
                                     <button
                                         key={bg.url}
-                                        onClick={() => setCurrentBg(bg.url)}
-                                        className={`group relative rounded-xl overflow-hidden border-4 transition-all ${
-                                            currentBg === bg.url
-                                                ? 'border-purple-500 shadow-lg shadow-purple-500/50'
-                                                : 'border-white/20 hover:border-white/40'
-                                        }`}
+                                        onClick={() => {
+                                            setCurrentBg(bg.url);
+                                            setIsOpen(false);
+                                        }}
+                                        className="group relative overflow-hidden rounded-xl border border-white/10 text-left transition hover:border-white/35 focus:outline-none focus-visible:ring-2 focus-visible:ring-purple-300"
                                     >
-                                        <img src={bg.url} alt={bg.name} className="w-full h-28 object-cover group-hover:scale-110 transition-transform duration-500" />
-                                        <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" />
+                                        <img
+                                            src={bg.url}
+                                            alt={bg.name}
+                                            loading="lazy"
+                                            decoding="async"
+                                            className="h-24 w-full object-cover transition-transform duration-300 group-hover:scale-105"
+                                        />                                        <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" />
                                         <p className="absolute bottom-1 left-1 text-xs font-medium text-white">{bg.name}</p>
                                         {currentBg === bg.url && (
                                             <div className="absolute top-2 right-2 w-3 h-3 bg-purple-500 rounded-full animate-pulse" />

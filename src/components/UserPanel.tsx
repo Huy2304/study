@@ -1,109 +1,127 @@
-"use client"
+"use client";
 
-import { useEffect, useState } from "react"
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import {
+    LogIn,
+    LogOut,
+    Trophy,
+    User,
+    UserPlus,
+} from "lucide-react";
+
+import { signOut, useSession } from "@/lib/auth-client";
 import {
     Tooltip,
     TooltipContent,
-    TooltipProvider,
     TooltipTrigger,
-} from "@/components/ui/tooltip"
-import { createClient } from "@/utils/suspabase/client"  // ← DÙNG CLIENT
-import { User, LogOut, LogIn, Settings, HelpCircle, Crown } from "lucide-react"
-import { logout } from "@/app/auth/signout/action"
+} from "@/components/ui/tooltip";
 
 export default function UserPanel() {
-    const [user, setUser] = useState<any>(null)
-    const [loading, setLoading] = useState(true)
+    const router = useRouter();
+    const { data: session } = useSession();
+    const user = session?.user ?? null;
 
-    useEffect(() => {
-        const supabase = createClient()
-        supabase.auth.getUser().then(({ data: { user } }) => {
-            setUser(user)
-            setLoading(false)
-        })
-
-        // Optional: listen realtime nếu cần
-        const { data: listener } = supabase.auth.onAuthStateChange((_, session) => {
-            setUser(session?.user ?? null)
-        })
-
-        return () => listener.subscription.unsubscribe()
-    }, [])
-
-    if (loading) {
-        return (
-            <button className="relative w-11 h-11 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 animate-pulse" />
-        )
+    async function handleSignOut() {
+        await signOut();
+        router.refresh();
     }
 
     return (
-        <TooltipProvider delayDuration={150}>
-            <Tooltip>
-                <TooltipTrigger asChild>
-                    <button className="relative w-11 h-11 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-white font-bold text-lg shadow-xl ring-4 ring-white/20 hover:ring-white/40 transition-all duration-300 hover:scale-110">
-                        <User size={24} strokeWidth={2} className="drop-shadow" />
-                        <span className="absolute bottom-0 right-0 w-3.5 h-3.5 bg-emerald-400 border-2 border-black rounded-full"></span>
-                    </button>
-                </TooltipTrigger>
-
-                <TooltipContent
-                    side="bottom"
-                    align="end"
-                    className="bg-black/95 backdrop-blur-2xl border border-white/20 p-0 rounded-2xl shadow-2xl overflow-hidden"
-                    sideOffset={12}
+        <Tooltip>
+            <TooltipTrigger asChild>
+                <button
+                    type="button"
+                    className="relative flex h-11 w-11 items-center justify-center rounded-full bg-gradient-to-br from-purple-500 to-pink-500 text-white shadow-xl ring-4 ring-white/20 transition-all duration-300 hover:scale-110 hover:ring-white/40"
+                    aria-label={
+                        user
+                            ? `Mở tài khoản của ${user.name}`
+                            : "Mở menu tài khoản"
+                    }
                 >
-                    <div className="w-72">
-                        {/* Header */}
-                        <div className="bg-gradient-to-r from-purple-600/50 to-pink-600/50 px-5 py-4">
-                            <div className="flex items-center gap-3">
-                                <div className="w-12 h-12 rounded-full bg-white/20 backdrop-blur flex items-center justify-center">
-                                    <User size={28} strokeWidth={2} className="text-white" />
-                                </div>
-                                <div>
-                                    <p className="text-white font-bold">
-                                        {user?.email?.split("@")[0] || "Khách"}
-                                    </p>
-                                    <p className="text-white/70 text-xs flex items-center gap-1">
-                                        Pro Member
-                                    </p>
-                                </div>
+                    <User
+                        size={24}
+                        strokeWidth={2}
+                        className="drop-shadow"
+                        aria-hidden="true"
+                    />
+                    <span
+                        className={`absolute bottom-0 right-0 h-3.5 w-3.5 rounded-full border-2 border-black ${
+                            user ? "bg-emerald-400" : "bg-white/50"
+                        }`}
+                    />
+                </button>
+            </TooltipTrigger>
+
+            <TooltipContent
+                side="bottom"
+                align="end"
+                className="overflow-hidden rounded-2xl border border-white/20 bg-black/95 p-0 shadow-2xl backdrop-blur-2xl"
+                sideOffset={12}
+            >
+                <div className="w-72">
+                    <div className="bg-gradient-to-r from-purple-600/50 to-pink-600/50 px-5 py-4">
+                        <div className="flex items-center gap-3">
+                            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-white/20 backdrop-blur">
+                                <User
+                                    size={28}
+                                    strokeWidth={2}
+                                    className="text-white"
+                                    aria-hidden="true"
+                                />
+                            </div>
+                            <div className="min-w-0">
+                                <p className="truncate font-bold text-white">
+                                    {user?.name ?? "Khách"}
+                                </p>
+                                <p className="text-xs text-white/70">
+                                    {user
+                                        ? "Điểm được đồng bộ với Supabase"
+                                        : "Đăng nhập để lưu thành tích"}
+                                </p>
                             </div>
                         </div>
-
-                        <div className="p-3 space-y-1">
-                            <button className="w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/10 transition text-white/80 text-left">
-                                <Settings size={18} strokeWidth={2} />
-                                <span>Cài đặt</span>
-                            </button>
-                            <button className="w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/10 transition text-white/80 text-left">
-                                <HelpCircle size={18} strokeWidth={2} />
-                                <span>Trợ giúp</span>
-                            </button>
-                            <div className="border-t border-white/10 my-2"></div>
-
-                            {user ? (
-                                <form action={logout} className="w-full">
-                                    <button
-                                        type="submit"
-                                        className="w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-red-500/20 transition text-red-400 text-left"
-                                    >
-                                        <LogOut size={18} strokeWidth={2} />
-                                        <span>Đăng xuất</span>
-                                    </button>
-                                </form>
-                            ) : (
-                                <a
-                                    href="/login"
-                                    className="flex w-full items-center gap-3 px-4 py-3 rounded-xl hover:bg-blue-500/20 transition text-blue-400"
-                                >
-                                    <LogIn size={20} strokeWidth={2} />
-                                    <span>Đăng nhập</span>
-                                </a>
-                            )}
-                        </div>
                     </div>
-                </TooltipContent>
-            </Tooltip>
-        </TooltipProvider>
-    )
+
+                    <div className="space-y-1 p-3">
+                        <Link
+                            href="/bang-xep-hang"
+                            className="flex w-full items-center gap-3 rounded-xl px-4 py-3 text-left text-white/80 transition hover:bg-white/10"
+                        >
+                            <Trophy size={18} aria-hidden="true" />
+                            <span>Bảng xếp hạng</span>
+                        </Link>
+
+                        {user ? (
+                            <button
+                                type="button"
+                                onClick={() => void handleSignOut()}
+                                className="flex w-full items-center gap-3 rounded-xl px-4 py-3 text-left text-red-300 transition hover:bg-red-500/15"
+                            >
+                                <LogOut size={18} aria-hidden="true" />
+                                <span>Đăng xuất</span>
+                            </button>
+                        ) : (
+                            <>
+                                <Link
+                                    href="/login"
+                                    className="flex w-full items-center gap-3 rounded-xl px-4 py-3 text-left text-cyan-300 transition hover:bg-cyan-500/15"
+                                >
+                                    <LogIn size={18} aria-hidden="true" />
+                                    <span>Đăng nhập</span>
+                                </Link>
+                                <Link
+                                    href="/register"
+                                    className="flex w-full items-center gap-3 rounded-xl px-4 py-3 text-left text-purple-200 transition hover:bg-purple-500/15"
+                                >
+                                    <UserPlus size={18} aria-hidden="true" />
+                                    <span>Tạo tài khoản</span>
+                                </Link>
+                            </>
+                        )}
+                    </div>
+                </div>
+            </TooltipContent>
+        </Tooltip>
+    );
 }

@@ -1,0 +1,28 @@
+import { headers } from "next/headers";
+
+import { auth } from "@/lib/auth";
+
+export class UnauthorizedError extends Error {
+    constructor() {
+        super("UNAUTHORIZED");
+        this.name = "UnauthorizedError";
+    }
+}
+
+export async function getCurrentUser() {
+    const session = await auth.api.getSession({
+        headers: await headers(),
+    });
+
+    return session?.user ?? null;
+}
+
+export async function requireUser() {
+    const user = await getCurrentUser();
+
+    if (!user) {
+        throw new UnauthorizedError();
+    }
+
+    return user;
+}

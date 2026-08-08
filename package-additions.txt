@@ -1,0 +1,5 @@
+npm install better-auth @better-auth/drizzle-adapter drizzle-orm postgres
+npm install -D drizzle-kit
+
+# Nếu dự án chưa có:
+npm install lucide-react

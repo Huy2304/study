@@ -1,0 +1,1 @@
+CREATE UNIQUE INDEX "game_runs_daily_challenge_unique" ON "game_runs" USING btree ("user_id","game_mode") WHERE "game_runs"."game_mode" like 'daily-%';
