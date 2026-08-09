@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Image from "next/image";
 import { Analytics } from "@vercel/analytics/next";
 
 import { ErrorBoundary } from "@/components/ErrorBoundary";
@@ -65,14 +66,15 @@ function BackgroundMedia({
     }
 
     return (
-        <img
+        <Image
             key={src}
             src={src}
             alt=""
+            fill
+            sizes="100vw"
+            priority={priority}
+            unoptimized={src.endsWith(".gif")}
             className={mediaClassName}
-            loading={priority ? "eager" : "lazy"}
-            fetchPriority={priority ? "high" : "auto"}
-            decoding="async"
             onLoad={onReady}
             onError={onError}
             aria-hidden="true"

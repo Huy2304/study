@@ -65,7 +65,7 @@ export default function Support() {
             className="fixed inset-0 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm"
             style={{ zIndex: 330 }}
         >
-            <div className="relative w-full max-w-lg rounded-2xl bg-gray-900 border border-white/20 p-8 shadow-2xl">
+            <div className="relative max-h-[calc(100dvh-2rem)] w-full max-w-lg overflow-y-auto rounded-2xl border border-white/20 bg-gray-900 p-5 shadow-2xl sm:p-8">
                 {/* Nút đóng */}
                 <button
                     onClick={() => setOpen(false)}

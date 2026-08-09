@@ -44,6 +44,8 @@
 }
 
 :root {
+  --app-header-safe-area: 7rem;
+  --app-bottom-safe-area: 5.5rem;
   --radius: 0.625rem;
   --background: oklch(1 0 0);
   --foreground: oklch(0.145 0 0);
@@ -121,16 +123,22 @@
   }
 }
 
-@media (max-height: 700px) {
+@media (max-height: 920px) {
   .focus-timer-layout {
     transform: scale(0.9);
     transform-origin: center;
   }
 }
 
+@media (max-height: 740px) {
+  .focus-timer-layout {
+    transform: scale(0.8);
+  }
+}
+
 @media (max-height: 600px) {
   .focus-timer-layout {
-    transform: scale(0.78);
+    transform: scale(0.7);
   }
 }
 

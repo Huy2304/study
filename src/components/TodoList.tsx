@@ -82,7 +82,7 @@ export default function TodoList() {
     };
 
     return (
-        <div className="fixed left-4 right-4 top-24 z-40 sm:left-auto sm:right-6 sm:w-80">
+        <div className="fixed bottom-24 left-4 right-4 top-24 z-40 overflow-y-auto sm:left-auto sm:right-6 sm:w-80">
             {/* Glass card */}
             <div className="bg-white/10 backdrop-blur-xl rounded-2xl border border-white/20 shadow-2xl p-6">
                 <h3 className="text-xl font-bold text-white mb-5 flex items-center gap-2">

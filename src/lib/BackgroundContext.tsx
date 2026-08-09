@@ -37,6 +37,8 @@ export function BackgroundProvider({
         useState(DEFAULT_BACKGROUND);
 
     useEffect(() => {
+        let frameId: number | undefined;
+
         try {
             const savedBg = localStorage.getItem(STORAGE_KEY);
 
@@ -45,11 +47,19 @@ export function BackgroundProvider({
             );
 
             if (savedBg && isValid) {
-                setCurrentBgState(savedBg);
+                frameId = window.requestAnimationFrame(() => {
+                    setCurrentBgState(savedBg);
+                });
             }
         } catch {
-            setCurrentBgState(DEFAULT_BACKGROUND);
+            // Giữ background mặc định nếu localStorage không dùng được.
         }
+
+        return () => {
+            if (frameId !== undefined) {
+                window.cancelAnimationFrame(frameId);
+            }
+        };
     }, []);
 
     const setCurrentBg = useCallback((url: string) => {

@@ -252,8 +252,14 @@ export function CLockDown() {
           : "Thời lượng tự chọn";
 
     return (
-        <div className="pointer-events-none fixed inset-0 flex items-center justify-center px-4 pb-20 pt-16 sm:pb-16">
-            <main className="focus-timer-layout pointer-events-auto mx-auto flex w-full max-w-md flex-col items-center text-center">
+        <div
+            className={`fixed inset-0 overflow-y-auto px-4 ${
+                isSuperFocus
+                    ? "pb-20 pt-4"
+                    : "pb-[var(--app-bottom-safe-area)] pt-[var(--app-header-safe-area)]"
+            }`}
+        >
+            <main className="focus-timer-layout mx-auto flex min-h-full w-full max-w-md flex-col items-center justify-center py-2 text-center">
                 <p className="sr-only" role="status" aria-live="polite">
                     {completionMessage}
                 </p>

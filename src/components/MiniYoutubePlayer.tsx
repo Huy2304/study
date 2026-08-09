@@ -61,7 +61,7 @@ export default function MiniYoutubePlayer() {
             {/* Mini Player - chỉ render 1 lần khi bật nhạc */}
             {isMusicOn && (
                 <div
-                    className={`fixed left-5 bottom-24 w-96 max-w-[92vw] transition-all duration-500 ease-out origin-bottom-left ${
+                    className={`fixed bottom-20 left-4 max-h-[calc(100dvh-6rem)] w-96 max-w-[calc(100vw-2rem)] overflow-y-auto transition-all duration-500 ease-out origin-bottom-left sm:left-5 ${
                         isPlayerOpen
                             ? 'translate-y-0 opacity-100 scale-100'
                             : 'translate-y-8 opacity-0 scale-95 pointer-events-none'

@@ -32,7 +32,7 @@ export default function BackgroundChanger() {
                     />
 
                     <div 
-                        className="fixed inset-x-0 bottom-24 left-1/2 -translate-x-1/2 w-full max-w-3xl px-4"
+                        className="fixed inset-x-0 bottom-20 mx-auto max-h-[calc(100dvh-6rem)] w-[calc(100%-2rem)] max-w-3xl overflow-y-auto"
                         style={{ zIndex: 321 }}
                     >
                         <div className="bg-black/95 backdrop-blur-2xl rounded-3xl border border-white/20 shadow-2xl">
@@ -43,7 +43,7 @@ export default function BackgroundChanger() {
                                 </button>
                             </div>
 
-                            <div className="p-5 grid grid-cols-3 sm:grid-cols-4 gap-4 max-h-96 overflow-y-auto">
+                            <div className="grid grid-cols-3 gap-4 p-5 sm:grid-cols-4">
                                 {backgrounds.map((bg) => (
                                     <button
                                         key={bg.url}

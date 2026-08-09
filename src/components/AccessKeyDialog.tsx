@@ -1,18 +1,20 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { useRouter } from "next/navigation";
 
 const CORRECT_KEY = "admin123"; // <-- thay bằng key bạn muốn (hoặc để trong .env sau)
 
 export function AccessKeyDialog({ children }: { children: React.ReactNode }) {
-    const [isOpen, setIsOpen] = useState(true);
+    const [isOpen, setIsOpen] = useState(() => {
+        if (typeof window === "undefined") return true;
+
+        return localStorage.getItem("admin_access") !== "granted";
+    });
     const [key, setKey] = useState("");
     const [error, setError] = useState("");
-    const router = useRouter();
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
@@ -23,13 +25,6 @@ export function AccessKeyDialog({ children }: { children: React.ReactNode }) {
             setError("Key không đúng!");
         }
     };
-
-    useEffect(() => {
-        const hasAccess = localStorage.getItem("admin_access") === "granted";
-        if (hasAccess) {
-            setIsOpen(false);
-        }
-    }, []);
 
     if (!isOpen) return <>{children}</>;
 

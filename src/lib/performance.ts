@@ -1,13 +1,13 @@
 // lib/performance.ts - Utilities cho performance optimization
-import { useCallback, useMemo } from 'react';
+import { useCallback } from 'react';
 
 // Debounce function
-export function debounce<T extends (...args: any[]) => any>(
-    func: T,
+export function debounce<TArgs extends unknown[], TResult>(
+    func: (...args: TArgs) => TResult,
     wait: number
-): (...args: Parameters<T>) => void {
-    let timeout: NodeJS.Timeout | null = null;
-    return function executedFunction(...args: Parameters<T>) {
+): (...args: TArgs) => void {
+    let timeout: ReturnType<typeof setTimeout> | null = null;
+    return function executedFunction(...args: TArgs) {
         const later = () => {
             timeout = null;
             func(...args);
@@ -18,12 +18,12 @@ export function debounce<T extends (...args: any[]) => any>(
 }
 
 // Throttle function
-export function throttle<T extends (...args: any[]) => any>(
-    func: T,
+export function throttle<TArgs extends unknown[], TResult>(
+    func: (...args: TArgs) => TResult,
     limit: number
-): (...args: Parameters<T>) => void {
+): (...args: TArgs) => void {
     let inThrottle: boolean;
-    return function executedFunction(...args: Parameters<T>) {
+    return function executedFunction(...args: TArgs) {
         if (!inThrottle) {
             func(...args);
             inThrottle = true;
@@ -43,9 +43,12 @@ export function preloadImage(src: string): Promise<void> {
 }
 
 // Hook để memoize expensive computations
-export function useStableCallback<T extends (...args: any[]) => any>(
-    callback: T
-): T {
-    return useCallback(callback, []) as T;
+export function useStableCallback<TArgs extends unknown[], TResult>(
+    callback: (...args: TArgs) => TResult
+): (...args: TArgs) => TResult {
+    return useCallback(
+        (...args: TArgs) => callback(...args),
+        [callback]
+    );
 }
 
