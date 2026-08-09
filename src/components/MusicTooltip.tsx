@@ -1,25 +1,34 @@
-// components/MusicTooltip.tsx
-'use client';
+"use client";
 
-import { useState, useEffect, useRef } from 'react';
-import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
-import { Music, CloudRain, Coffee, Trees, Waves, Flame, Volume2, VolumeX } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
+import {
+    CloudRain,
+    Coffee,
+    Flame,
+    Music,
+    Trees,
+    Volume2,
+    VolumeX,
+    Waves,
+    X,
+} from "lucide-react";
 
 const sounds = [
     { name: "Lo-fi", icon: Music, color: "text-purple-400", file: "/sounds/lofi.mp3" },
-    { name: "Rain", icon: CloudRain, color: "text-blue-400", file: "/sounds/rain.wav" },
+    { name: "Mưa", icon: CloudRain, color: "text-blue-400", file: "/sounds/rain.wav" },
     { name: "Café", icon: Coffee, color: "text-amber-400", file: "/sounds/cafe.mp3" },
-    { name: "Forest", icon: Trees, color: "text-green-400", file: "/sounds/forest.mp3" },
-    { name: "Ocean", icon: Waves, color: "text-cyan-400", file: "/sounds/ocean.mp3" },
-    { name: "Fire", icon: Flame, color: "text-orange-400", file: "/sounds/fireplace.mp3" },
-];
+    { name: "Rừng", icon: Trees, color: "text-green-400", file: "/sounds/forest.mp3" },
+    { name: "Biển", icon: Waves, color: "text-cyan-400", file: "/sounds/ocean.mp3" },
+    { name: "Lửa", icon: Flame, color: "text-orange-400", file: "/sounds/fireplace.mp3" },
+] as const;
 
 export function MusicTooltip() {
     const [currentSound, setCurrentSound] = useState<string | null>(null);
     const [isMuted, setIsMuted] = useState(false);
+    const [isOpen, setIsOpen] = useState(false);
     const audioRef = useRef<HTMLAudioElement | null>(null);
 
-    // Tạo 1 audio duy nhất, thay src khi đổi nhạc
     useEffect(() => {
         audioRef.current = new Audio();
         audioRef.current.loop = true;
@@ -31,7 +40,6 @@ export function MusicTooltip() {
         };
     }, []);
 
-    // Khi đổi nhạc hoặc mute
     useEffect(() => {
         if (!audioRef.current) return;
 
@@ -45,68 +53,107 @@ export function MusicTooltip() {
         audioRef.current.muted = isMuted;
     }, [currentSound, isMuted]);
 
+    useEffect(() => {
+        if (!isOpen) return;
+
+        const closeOnEscape = (event: KeyboardEvent) => {
+            if (event.key === "Escape") setIsOpen(false);
+        };
+
+        window.addEventListener("keydown", closeOnEscape);
+        return () => window.removeEventListener("keydown", closeOnEscape);
+    }, [isOpen]);
+
     const playSound = (file: string) => {
-        if (currentSound === file) {
-            setCurrentSound(null); // click lại cùng icon → tắt
-        } else {
-            setCurrentSound(file);
-        }
+        setCurrentSound((current) => (current === file ? null : file));
     };
 
     return (
-        <Tooltip>
-            <TooltipTrigger asChild>
-                <button 
-                    className="flex items-center justify-center w-12 h-12 rounded-xl bg-white/10 hover:bg-white/20 backdrop-blur-xl border border-white/20 transition-all hover:scale-110 group focus:outline-none focus:ring-2 focus:ring-white/50 relative"
-                    aria-label={currentSound ? `Đang phát: ${currentSound}` : "Mở focus sounds"}
-                    aria-expanded={false}
-                >
-                    <Music size={22} className="text-white/70 group-hover:text-white transition" aria-hidden="true" />
-                    {currentSound && (
-                        <span 
-                            className="absolute -top-1 -right-1 w-3 h-3 bg-green-400 rounded-full animate-pulse"
-                            aria-label="Đang phát"
-                        />
-                    )}
-                </button>
-            </TooltipTrigger>
-
-            <TooltipContent side="top" className="bg-black/95 border border-white/20 p-5 rounded-2xl">
-                <div className="flex items-center justify-between mb-4">
-                    <p className="text-sm font-medium">Focus Sounds</p>
-                    <button
-                        onClick={() => setIsMuted(!isMuted)}
-                        className="p-2 rounded-lg hover:bg-white/10 transition"
-                    >
-                        {isMuted ? <VolumeX size={18} /> : <Volume2 size={18} />}
-                    </button>
-                </div>
-
-                <div className="grid grid-cols-3 gap-3">
-                    {sounds.map(({ name, icon: Icon, color, file }) => (
-                        <button
-                            key={name}
-                            onClick={() => playSound(file)}
-                            className={`
-                flex flex-col items-center gap-2 p-4 rounded-xl transition-all
-                ${currentSound === file
-                                ? "bg-white/20 ring-2 ring-white/50 scale-110"
-                                : "bg-white/5 hover:bg-white/15"
-                            }
-              `}
-                        >
-                            <Icon size={28} className={color} />
-                            <span className="text-xs">{name}</span>
-                        </button>
-                    ))}
-                </div>
-
+        <>
+            <button
+                type="button"
+                onClick={() => setIsOpen((current) => !current)}
+                className="group relative flex h-12 w-12 items-center justify-center rounded-xl border border-white/20 bg-white/10 backdrop-blur-xl transition-all hover:scale-105 hover:bg-white/20 focus:outline-none focus-visible:ring-2 focus-visible:ring-white/50"
+                aria-label="Mở âm thanh tập trung"
+                aria-expanded={isOpen}
+            >
+                <Music size={22} className="text-white/70 transition group-hover:text-white" aria-hidden="true" />
                 {currentSound && (
-                    <p className="text-xs text-white/60 text-center mt-3">
-                        Click again to stop • Playing in background
-                    </p>
+                    <span
+                        className="absolute -right-1 -top-1 h-3 w-3 rounded-full bg-green-400"
+                        aria-label="Đang phát âm thanh"
+                    />
                 )}
-            </TooltipContent>
-        </Tooltip>
+            </button>
+
+            {isOpen &&
+                typeof document !== "undefined" &&
+                createPortal(
+                    <>
+                        <button
+                            type="button"
+                            className="fixed inset-0"
+                            style={{ zIndex: 200 }}
+                            onClick={() => setIsOpen(false)}
+                            aria-label="Đóng âm thanh tập trung"
+                        />
+                        <section
+                            role="dialog"
+                            aria-modal="false"
+                            aria-label="Âm thanh tập trung"
+                            className="fixed bottom-20 left-4 max-h-[calc(100dvh-6rem)] w-[calc(100%-2rem)] max-w-sm overflow-y-auto rounded-2xl border border-white/20 bg-black/95 p-4 text-white shadow-2xl backdrop-blur-2xl"
+                            style={{ zIndex: 201 }}
+                        >
+                            <div className="mb-4 flex items-center justify-between gap-3">
+                                <p className="text-sm font-medium">Âm thanh tập trung</p>
+                                <div className="flex items-center gap-1">
+                                    <button
+                                        type="button"
+                                        onClick={() => setIsMuted((current) => !current)}
+                                        className="rounded-lg p-2 transition hover:bg-white/10"
+                                        aria-label={isMuted ? "Bật âm thanh" : "Tắt tiếng"}
+                                    >
+                                        {isMuted ? <VolumeX size={18} /> : <Volume2 size={18} />}
+                                    </button>
+                                    <button
+                                        type="button"
+                                        onClick={() => setIsOpen(false)}
+                                        className="rounded-lg p-2 transition hover:bg-white/10"
+                                        aria-label="Đóng âm thanh tập trung"
+                                    >
+                                        <X size={18} />
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div className="grid grid-cols-3 gap-2 sm:gap-3">
+                                {sounds.map(({ name, icon: Icon, color, file }) => (
+                                    <button
+                                        key={name}
+                                        type="button"
+                                        onClick={() => playSound(file)}
+                                        className={`flex min-h-20 flex-col items-center justify-center gap-2 rounded-xl p-2 text-center transition sm:min-h-24 sm:p-3 ${
+                                            currentSound === file
+                                                ? "bg-white/20 ring-2 ring-white/50"
+                                                : "bg-white/5 hover:bg-white/15"
+                                        }`}
+                                        aria-pressed={currentSound === file}
+                                    >
+                                        <Icon size={24} className={color} aria-hidden="true" />
+                                        <span className="text-xs">{name}</span>
+                                    </button>
+                                ))}
+                            </div>
+
+                            {currentSound && (
+                                <p className="mt-3 text-center text-xs text-white/60">
+                                    Chọn lại âm thanh đang phát để dừng.
+                                </p>
+                            )}
+                        </section>
+                    </>,
+                    document.body
+                )}
+        </>
     );
 }

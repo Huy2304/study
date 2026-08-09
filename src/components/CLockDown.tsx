@@ -76,7 +76,9 @@ export function CLockDown() {
     const timeLeftRef = useRef(timeLeft);
     const hasStartedRef = useRef(false);
     const completionRecordedRef = useRef(false);
+    const timerLayoutRef = useRef<HTMLElement>(null);
     const [estimatedEndTime, setEstimatedEndTime] = useState("");
+    const [layoutScale, setLayoutScale] = useState(1);
 
     const formattedTime = useMemo(() => formatTime(timeLeft), [timeLeft]);
     const [minutesPart, secondsPart] = formattedTime.split(":");
@@ -226,6 +228,49 @@ export function CLockDown() {
         return () => window.removeEventListener("keydown", onKeyDown);
     }, [isCompleted]);
 
+    useEffect(() => {
+        const timerLayout = timerLayoutRef.current;
+        if (!timerLayout) return;
+
+        let frameId = 0;
+        const headerSpace = isSuperFocus ? 16 : 112;
+        const bottomSpace = 88;
+
+        const updateScale = () => {
+            const availableHeight = Math.max(
+                1,
+                window.innerHeight - headerSpace - bottomSpace - 8
+            );
+            const contentHeight = timerLayout.scrollHeight;
+            const nextScale = Math.min(
+                1,
+                Math.max(0.65, availableHeight / contentHeight)
+            );
+
+            setLayoutScale((currentScale) =>
+                Math.abs(currentScale - nextScale) < 0.01
+                    ? currentScale
+                    : nextScale
+            );
+        };
+
+        const scheduleUpdate = () => {
+            window.cancelAnimationFrame(frameId);
+            frameId = window.requestAnimationFrame(updateScale);
+        };
+
+        const resizeObserver = new ResizeObserver(scheduleUpdate);
+        resizeObserver.observe(timerLayout);
+        window.addEventListener("resize", scheduleUpdate);
+        scheduleUpdate();
+
+        return () => {
+            window.cancelAnimationFrame(frameId);
+            resizeObserver.disconnect();
+            window.removeEventListener("resize", scheduleUpdate);
+        };
+    }, [isSuperFocus]);
+
     const toggleTimer = () => {
         if (isCompleted) return;
 
@@ -253,13 +298,17 @@ export function CLockDown() {
 
     return (
         <div
-            className={`fixed inset-0 overflow-y-auto px-4 ${
+            className={`fixed inset-0 flex items-center justify-center overflow-hidden px-4 ${
                 isSuperFocus
                     ? "pb-20 pt-4"
                     : "pb-[var(--app-bottom-safe-area)] pt-[var(--app-header-safe-area)]"
             }`}
         >
-            <main className="focus-timer-layout mx-auto flex min-h-full w-full max-w-md flex-col items-center justify-center py-2 text-center">
+            <main
+                ref={timerLayoutRef}
+                className="focus-timer-layout mx-auto flex w-full max-w-md flex-none flex-col items-center py-2 text-center transition-transform duration-200"
+                style={{ transform: `scale(${layoutScale})` }}
+            >
                 <p className="sr-only" role="status" aria-live="polite">
                     {completionMessage}
                 </p>

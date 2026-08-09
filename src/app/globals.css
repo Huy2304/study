@@ -123,23 +123,8 @@
   }
 }
 
-@media (max-height: 920px) {
-  .focus-timer-layout {
-    transform: scale(0.9);
-    transform-origin: center;
-  }
-}
-
-@media (max-height: 740px) {
-  .focus-timer-layout {
-    transform: scale(0.8);
-  }
-}
-
-@media (max-height: 600px) {
-  .focus-timer-layout {
-    transform: scale(0.7);
-  }
+.focus-timer-layout {
+  transform-origin: center;
 }
 
 .calendar-flip-card {

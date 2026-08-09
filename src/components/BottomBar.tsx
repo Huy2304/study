@@ -16,7 +16,6 @@ import {
 import { createPortal } from "react-dom";
 
 import BackgroundChanger from "@/components/BackgroundChanger";
-import AiTutor from "@/components/AiTutor";
 import { MusicTooltip } from "@/components/MusicTooltip";
 import { useFocusMode } from "@/lib/FocusModeContext";
 import { Z_INDEX } from "@/lib/zIndexManager";
@@ -182,14 +181,9 @@ function BottomBar({ items, actionButton }: BottomBarProps) {
                 priority: 3,
             },
             {
-                id: "ai-tutor",
-                component: <AiTutor />,
-                priority: 4,
-            },
-            {
                 id: "more-tools",
                 component: <MoreTools />,
-                priority: 5,
+                priority: 4,
             },
         ],
         []

@@ -196,7 +196,7 @@ export default function TranslatePro({ asIconButton = false }: TranslateProProps
                                         <SelectTrigger className="w-full bg-white/20 border-white/30 text-white/90 sm:w-36">
                                             <SelectValue />
                                         </SelectTrigger>
-                                        <SelectContent className="bg-white/95 dark:bg-gray-900/95">
+                                        <SelectContent className="z-[400] bg-white/95 dark:bg-gray-900/95">
                                             {LANGUAGES.map((lang) => (
                                                 <SelectItem key={lang.code} value={lang.code}>
                                                     <span className="flex items-center gap-2">
@@ -222,7 +222,7 @@ export default function TranslatePro({ asIconButton = false }: TranslateProProps
                                         <SelectTrigger className="w-full bg-white/20 border-white/30 text-white/90 sm:w-36">
                                             <SelectValue />
                                         </SelectTrigger>
-                                        <SelectContent className="bg-white/95 dark:bg-gray-900/95">
+                                        <SelectContent className="z-[400] bg-white/95 dark:bg-gray-900/95">
                                             {LANGUAGES.filter(l => l.code !== "auto").map((lang) => (
                                                 <SelectItem key={lang.code} value={lang.code}>
                                                     <span className="flex items-center gap-2">
@@ -361,7 +361,7 @@ export default function TranslatePro({ asIconButton = false }: TranslateProProps
                                     <SelectTrigger className="w-36 bg-white/20 border-white/30 text-white/90">
                                         <SelectValue />
                                     </SelectTrigger>
-                                    <SelectContent className="bg-white/95 dark:bg-gray-900/95">
+                                    <SelectContent className="z-[400] bg-white/95 dark:bg-gray-900/95">
                                         {LANGUAGES.map((lang) => (
                                             <SelectItem key={lang.code} value={lang.code}>
                         <span className="flex items-center gap-2">
@@ -387,7 +387,7 @@ export default function TranslatePro({ asIconButton = false }: TranslateProProps
                                     <SelectTrigger className="w-36 bg-white/20 border-white/30 text-white/90">
                                         <SelectValue />
                                     </SelectTrigger>
-                                    <SelectContent className="bg-white/95 dark:bg-gray-900/95">
+                                    <SelectContent className="z-[400] bg-white/95 dark:bg-gray-900/95">
                                         {LANGUAGES.filter(l => l.code !== "auto").map((lang) => (
                                             <SelectItem key={lang.code} value={lang.code}>
                         <span className="flex items-center gap-2">
