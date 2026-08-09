@@ -10,16 +10,21 @@ import {
 } from "react";
 import {
     CheckCircle2,
-    ChevronDown,
     Coffee,
     Pause,
     Play,
     RotateCcw,
     Settings2,
     Sparkles,
-    X,
 } from "lucide-react";
 
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogHeader,
+    DialogTitle,
+} from "@/components/ui/dialog";
 import { useFocusMode } from "@/lib/FocusModeContext";
 import { recordFocusSession } from "@/lib/daily-progress";
 
@@ -546,6 +551,102 @@ export function CLockDown() {
                                             </button>
                                         );
                                     })}
+
+                                    <Dialog
+                                        open={showSettings}
+                                        onOpenChange={setShowSettings}
+                                    >
+                                        <button
+                                            type="button"
+                                            disabled={isRunning}
+                                            onClick={() =>
+                                                setShowSettings(true)
+                                            }
+                                            className="inline-flex min-h-9 items-center gap-1.5 rounded-full border border-white/10 bg-white/[0.04] px-3 text-sm font-medium text-white/55 transition hover:bg-white/[0.1] hover:text-white disabled:cursor-not-allowed disabled:opacity-45"
+                                            aria-label="Chọn thời lượng khác"
+                                        >
+                                            <Settings2
+                                                size={15}
+                                                aria-hidden="true"
+                                            />
+                                            Khác
+                                        </button>
+
+                                        <DialogContent className="border-cyan-300/20 bg-zinc-950 p-5 text-white sm:max-w-sm">
+                                            <DialogHeader>
+                                                <DialogTitle className="flex items-center gap-2">
+                                                    <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-cyan-400/15 text-cyan-200">
+                                                        <Settings2
+                                                            size={18}
+                                                            aria-hidden="true"
+                                                        />
+                                                    </span>
+                                                    Thời lượng riêng
+                                                </DialogTitle>
+                                                <DialogDescription className="text-white/55">
+                                                    Chọn nhanh hoặc tạo phiên từ 5 đến 240 phút.
+                                                </DialogDescription>
+                                            </DialogHeader>
+
+                                            <div className="mt-4 grid grid-cols-4 gap-2">
+                                                {[15, 30, 45, 60].map(
+                                                    (minutes) => (
+                                                        <button
+                                                            key={minutes}
+                                                            type="button"
+                                                            onClick={() =>
+                                                                setCustomMinutes(
+                                                                    minutes
+                                                                )
+                                                            }
+                                                            className={`min-h-10 rounded-xl border text-sm font-medium transition ${
+                                                                customMinutes ===
+                                                                minutes
+                                                                    ? "border-cyan-300/60 bg-cyan-400/15 text-cyan-100"
+                                                                    : "border-white/10 bg-white/[0.04] text-white/55 hover:bg-white/[0.1] hover:text-white"
+                                                            }`}
+                                                        >
+                                                            {minutes}p
+                                                        </button>
+                                                    )
+                                                )}
+                                            </div>
+
+                                            <form
+                                                className="mt-4 flex gap-2"
+                                                onSubmit={(event) => {
+                                                    event.preventDefault();
+                                                    applyCustomDuration();
+                                                }}
+                                            >
+                                                <label className="sr-only" htmlFor="custom-duration">
+                                                    Số phút cho phiên riêng
+                                                </label>
+                                                <input
+                                                    id="custom-duration"
+                                                    type="number"
+                                                    min="5"
+                                                    max="240"
+                                                    value={customMinutes}
+                                                    onChange={(event) =>
+                                                        setCustomMinutes(
+                                                            Number(
+                                                                event.target
+                                                                    .value
+                                                            )
+                                                        )
+                                                    }
+                                                    className="min-h-11 min-w-0 flex-1 rounded-xl border border-white/10 bg-white/[0.05] px-3 text-white outline-none focus:border-cyan-300/60"
+                                                />
+                                                <button
+                                                    type="submit"
+                                                    className="min-h-11 rounded-xl bg-cyan-400 px-4 font-semibold text-cyan-950 transition hover:bg-cyan-300"
+                                                >
+                                                    Áp dụng
+                                                </button>
+                                            </form>
+                                        </DialogContent>
+                                    </Dialog>
                                 </div>
 
                                 <section
@@ -609,75 +710,6 @@ export function CLockDown() {
                                         <RotateCcw size={20} aria-hidden="true" />
                                     </button>
                                 </div>
-
-                                <button
-                                    type="button"
-                                    onClick={() =>
-                                        setShowSettings((open) => !open)
-                                    }
-                                    className="mt-2 inline-flex min-h-8 items-center gap-2 rounded-lg px-3 text-sm text-white/50 transition hover:bg-white/[0.06] hover:text-white"
-                                >
-                                    <Settings2 size={16} aria-hidden="true" />
-                                    Thời lượng khác
-                                    <ChevronDown
-                                        size={16}
-                                        className={
-                                            showSettings
-                                                ? "rotate-180 transition"
-                                                : "transition"
-                                        }
-                                        aria-hidden="true"
-                                    />
-                                </button>
-
-                                {showSettings && (
-                                    <section className="mt-3 w-full rounded-2xl border border-white/10 bg-black/35 p-4 text-left shadow-xl backdrop-blur-xl">
-                                        <div className="flex items-center justify-between gap-3">
-                                            <div>
-                                                <p className="font-medium text-white">
-                                                    Tạo phiên riêng
-                                                </p>
-                                                <p className="mt-1 text-xs text-white/45">
-                                                    Từ 5 đến 240 phút
-                                                </p>
-                                            </div>
-                                            <button
-                                                type="button"
-                                                onClick={() =>
-                                                    setShowSettings(false)
-                                                }
-                                                className="flex h-9 w-9 items-center justify-center rounded-lg text-white/45 transition hover:bg-white/10 hover:text-white"
-                                                aria-label="Đóng cài đặt thời lượng"
-                                            >
-                                                <X size={17} aria-hidden="true" />
-                                            </button>
-                                        </div>
-                                        <div className="mt-4 flex gap-2">
-                                            <input
-                                                type="number"
-                                                min="5"
-                                                max="240"
-                                                value={customMinutes}
-                                                onChange={(event) =>
-                                                    setCustomMinutes(
-                                                        Number(
-                                                            event.target.value
-                                                        )
-                                                    )
-                                                }
-                                                className="min-h-11 min-w-0 flex-1 rounded-xl border border-white/10 bg-white/[0.05] px-3 text-white outline-none focus:border-cyan-300/60"
-                                                aria-label="Số phút cho phiên riêng"
-                                            />
-                                            <button
-                                                type="button"
-                                                onClick={applyCustomDuration}
-                                                className="min-h-11 rounded-xl bg-white/10 px-4 font-medium text-white transition hover:bg-white/[0.16]"
-                                            >
-                                                Áp dụng
-                                            </button>
-                                        </div>
-                                    </section>
-                                )}
 
                             </>
                         )}
