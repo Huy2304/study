@@ -3,6 +3,7 @@
 import {
     useCallback,
     useEffect,
+    useLayoutEffect,
     useMemo,
     useRef,
     useState,
@@ -15,7 +16,7 @@ import {
     Play,
     RotateCcw,
     Settings2,
-    Target,
+    Sparkles,
     X,
 } from "lucide-react";
 
@@ -45,6 +46,8 @@ const CLOCK_FACES: Array<{
     { id: "flip", label: "Lật số" },
     { id: "minimal", label: "Tối giản" },
 ];
+
+const FOCUS_INTENTIONS = ["Ôn bài", "Làm bài tập", "Luyện đề"] as const;
 
 function formatTime(seconds: number) {
     const minutes = Math.floor(seconds / 60);
@@ -175,6 +178,9 @@ export function CLockDown() {
                 Math.ceil((deadline - Date.now()) / 1_000)
             );
 
+            if (nextTimeLeft === timeLeftRef.current) return;
+
+            timeLeftRef.current = nextTimeLeft;
             setTimeLeft(nextTimeLeft);
 
             if (nextTimeLeft === 0) {
@@ -256,21 +262,39 @@ export function CLockDown() {
                     <section className="mb-3 w-full rounded-2xl border border-white/10 bg-black/25 p-3 text-left shadow-xl backdrop-blur-xl">
                         <div className="flex items-start gap-3">
                             <span className="mt-0.5 flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-xl bg-cyan-400/15 text-cyan-200">
-                                <Target size={18} aria-hidden="true" />
+                                <Sparkles size={18} aria-hidden="true" />
                             </span>
-                            <label className="min-w-0 flex-1">
-                                <span className="block text-xs font-medium uppercase tracking-[0.14em] text-white/45">
-                                    Mục tiêu phiên này
-                                </span>
-                                <input
-                                    value={goal}
-                                    onChange={(event) =>
-                                        setGoal(event.target.value)
-                                    }
-                                    placeholder="Ví dụ: Ôn Toán chương 2"
-                                    className="mt-1 w-full bg-transparent text-base font-medium text-white outline-none placeholder:text-white/35"
-                                />
-                            </label>
+                            <div className="min-w-0 flex-1">
+                                <label className="block">
+                                    <span className="block text-xs font-medium uppercase tracking-[0.14em] text-white/45">
+                                        Phiên này, mình sẽ…
+                                    </span>
+                                    <input
+                                        value={goal}
+                                        onChange={(event) =>
+                                            setGoal(event.target.value)
+                                        }
+                                        placeholder="Ví dụ: hiểu xong chương 2"
+                                        className="mt-1 w-full bg-transparent text-base font-medium text-white outline-none placeholder:text-white/35"
+                                    />
+                                </label>
+                                <div className="mt-2 flex flex-wrap gap-1.5">
+                                    {FOCUS_INTENTIONS.map((intention) => (
+                                        <button
+                                            key={intention}
+                                            type="button"
+                                            onClick={() => setGoal(intention)}
+                                            className={`rounded-full border px-2.5 py-1 text-xs transition ${
+                                                goal === intention
+                                                    ? "border-cyan-300/50 bg-cyan-400/15 text-cyan-100"
+                                                    : "border-white/10 bg-white/[0.04] text-white/50 hover:bg-white/[0.1] hover:text-white"
+                                            }`}
+                                        >
+                                            {intention}
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
                         </div>
                     </section>
                 )}
@@ -655,21 +679,35 @@ function TimerCopy({
 }
 
 function CalendarFlipDigit({ digit }: { digit: string }) {
+    const currentDigitRef = useRef(digit);
+    const [leavingDigit, setLeavingDigit] = useState<string | null>(null);
+
+    useLayoutEffect(() => {
+        if (currentDigitRef.current === digit) return;
+
+        const previousDigit = currentDigitRef.current;
+        currentDigitRef.current = digit;
+
+        setLeavingDigit(previousDigit);
+    }, [digit]);
+
     return (
         <div className="calendar-flip-card relative h-24 overflow-hidden rounded-xl border border-white/15 bg-gradient-to-b from-zinc-100 to-zinc-300 text-zinc-950 shadow-[0_10px_24px_rgba(0,0,0,0.3)] sm:h-28">
-            <span className="pointer-events-none absolute inset-x-0 top-1/2 z-20 border-t border-zinc-500/50" />
-            <span className="pointer-events-none absolute left-1.5 top-1/2 z-30 h-1.5 w-1.5 -translate-y-1/2 rounded-full bg-zinc-600/70" />
-            <span className="pointer-events-none absolute right-1.5 top-1/2 z-30 h-1.5 w-1.5 -translate-y-1/2 rounded-full bg-zinc-600/70" />
-            <span className="absolute inset-0 grid place-items-center pt-1 text-5xl font-black tabular-nums sm:text-6xl">
+            <span className="pointer-events-none absolute left-3 top-2 z-30 h-2 w-2 rounded-full bg-zinc-700 shadow-[0_1px_0_rgba(255,255,255,0.7)]" />
+            <span className="pointer-events-none absolute right-3 top-2 z-30 h-2 w-2 rounded-full bg-zinc-700 shadow-[0_1px_0_rgba(255,255,255,0.7)]" />
+            <span className="calendar-sheet absolute inset-0 grid place-items-center pt-2 text-5xl font-black tabular-nums sm:text-6xl">
                 {digit}
             </span>
-            <span
-                key={digit}
-                className="calendar-flip-page absolute inset-0 z-10 grid place-items-center border-b border-zinc-400 bg-gradient-to-b from-white via-zinc-100 to-zinc-300 pt-1 text-5xl font-black tabular-nums sm:text-6xl"
-                aria-hidden="true"
-            >
-                {digit}
-            </span>
+            {leavingDigit && (
+                <span
+                    key={`${leavingDigit}-${digit}`}
+                    className="calendar-turning-sheet absolute inset-0 z-20 grid place-items-center border-b border-zinc-400 bg-gradient-to-b from-white via-zinc-100 to-zinc-300 pt-2 text-5xl font-black tabular-nums sm:text-6xl"
+                    onAnimationEnd={() => setLeavingDigit(null)}
+                    aria-hidden="true"
+                >
+                    {leavingDigit}
+                </span>
+            )}
         </div>
     );
 }

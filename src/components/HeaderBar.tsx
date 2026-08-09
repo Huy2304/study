@@ -1,6 +1,7 @@
 "use client"
 import { useState, useEffect, useMemo, useCallback } from 'react';
-import { LampDesk, Calendar, Book } from "lucide-react";
+import Link from "next/link";
+import { LampDesk, Calendar, Book, Trophy } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import TodoList from "@/components/TodoList";
 import { useFocusMode } from "@/lib/FocusModeContext";
@@ -90,6 +91,20 @@ export default function HeaderBar() {
                         </TooltipTrigger>
                         <TooltipContent>
                             {showTodoList ? 'Ẩn Todo List' : 'Hiện Todo List'}
+                        </TooltipContent>
+                    </Tooltip>
+                    <Tooltip>
+                        <TooltipTrigger asChild>
+                            <Link
+                                href="/bang-xep-hang"
+                                className="relative flex h-11 w-11 items-center justify-center rounded-lg text-yellow-300 transition hover:bg-white/10 hover:text-yellow-200 focus:outline-none focus:ring-2 focus:ring-white/50"
+                                aria-label="Mở bảng xếp hạng"
+                            >
+                                <Trophy size={20} aria-hidden="true" />
+                            </Link>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                            Bảng xếp hạng
                         </TooltipContent>
                     </Tooltip>
                     {/*<Tooltip>*/}
