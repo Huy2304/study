@@ -9,21 +9,15 @@ import {
     memo,
     type ReactElement,
     useCallback,
+    useEffect,
     useMemo,
     useState,
 } from "react";
+import { createPortal } from "react-dom";
 
 import BackgroundChanger from "@/components/BackgroundChanger";
 import AiTutor from "@/components/AiTutor";
 import { MusicTooltip } from "@/components/MusicTooltip";
-import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogHeader,
-    DialogTitle,
-    DialogTrigger,
-} from "@/components/ui/dialog";
 import { useFocusMode } from "@/lib/FocusModeContext";
 import { Z_INDEX } from "@/lib/zIndexManager";
 
@@ -78,41 +72,77 @@ function ToolLoading({ ariaLabel }: { ariaLabel: string }) {
 function MoreTools() {
     const [open, setOpen] = useState(false);
 
+    useEffect(() => {
+        if (!open) return;
+
+        const closeOnEscape = (event: KeyboardEvent) => {
+            if (event.key === "Escape") {
+                setOpen(false);
+            }
+        };
+
+        document.addEventListener("keydown", closeOnEscape);
+        return () =>
+            document.removeEventListener("keydown", closeOnEscape);
+    }, [open]);
+
     return (
-        <Dialog open={open} onOpenChange={setOpen}>
-            <DialogTrigger asChild>
-                <button
-                    type="button"
-                    className="flex h-12 w-12 items-center justify-center rounded-xl border border-white/20 bg-white/10 text-white/75 backdrop-blur-xl transition hover:scale-105 hover:bg-white/20 hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-white/70"
-                    aria-label="Mở thêm công cụ"
-                >
-                    <MoreHorizontal size={24} aria-hidden="true" />
-                </button>
-            </DialogTrigger>
+        <>
+            <button
+                type="button"
+                onClick={() => setOpen((current) => !current)}
+                className="flex h-12 w-12 items-center justify-center rounded-xl border border-white/20 bg-white/10 text-white/75 backdrop-blur-xl transition hover:scale-105 hover:bg-white/20 hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-white/70"
+                aria-label="Mở thêm công cụ"
+                aria-expanded={open}
+            >
+                <MoreHorizontal size={24} aria-hidden="true" />
+            </button>
 
-            <DialogContent className="max-w-[calc(100%-2rem)] border-white/15 bg-zinc-950 p-5 text-white sm:max-w-md">
-                <DialogHeader>
-                    <DialogTitle>Công cụ khác</DialogTitle>
-                    <DialogDescription className="text-white/55">
-                        Chỉ tải khi bạn mở để trang học tập luôn nhẹ và nhanh.
-                    </DialogDescription>
-                </DialogHeader>
+            {open &&
+                typeof document !== "undefined" &&
+                createPortal(
+                    <>
+                        <button
+                            type="button"
+                            className="fixed inset-0 bg-black/55 backdrop-blur-sm"
+                            style={{ zIndex: Z_INDEX.MODAL }}
+                            onClick={() => setOpen(false)}
+                            aria-label="Đóng thêm công cụ"
+                        />
 
-                {open && (
-                    <div className="grid grid-cols-3 gap-3 pt-2">
-                        <ToolShortcut label="YouTube">
-                            <MiniYoutubePlayer />
-                        </ToolShortcut>
-                        <ToolShortcut label="Dịch nhanh">
-                            <TranslatePro asIconButton />
-                        </ToolShortcut>
-                        <ToolShortcut label="Góp ý">
-                            <Support />
-                        </ToolShortcut>
-                    </div>
+                        <section
+                            role="dialog"
+                            aria-modal="true"
+                            aria-labelledby="more-tools-title"
+                            className="fixed bottom-20 left-0 right-0 mx-auto w-[calc(100%-2rem)] max-w-md rounded-2xl border border-white/15 bg-zinc-950 p-5 text-white shadow-2xl"
+                            style={{ zIndex: Z_INDEX.MODAL + 1 }}
+                        >
+                            <h2
+                                id="more-tools-title"
+                                className="text-lg font-semibold"
+                            >
+                                Công cụ khác
+                            </h2>
+                            <p className="mt-1 text-sm text-white/55">
+                                Chọn một công cụ để dùng trong lúc học.
+                            </p>
+
+                            <div className="mt-4 grid grid-cols-3 gap-3">
+                                <ToolShortcut label="YouTube">
+                                    <MiniYoutubePlayer />
+                                </ToolShortcut>
+                                <ToolShortcut label="Dịch nhanh">
+                                    <TranslatePro asIconButton />
+                                </ToolShortcut>
+                                <ToolShortcut label="Góp ý">
+                                    <Support />
+                                </ToolShortcut>
+                            </div>
+                        </section>
+                    </>,
+                    document.body
                 )}
-            </DialogContent>
-        </Dialog>
+        </>
     );
 }
 

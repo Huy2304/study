@@ -69,7 +69,7 @@ export default function TranslatePro({ asIconButton = false }: TranslateProProps
         setOutput(input)
     }
 
-    const translateText = async () => {
+    const translateText = React.useCallback(async () => {
         if (!input.trim()) {
             setOutput("")
             setDetectedLang("")
@@ -82,9 +82,22 @@ export default function TranslatePro({ asIconButton = false }: TranslateProProps
             const res = await fetch(
                 `https://translate.googleapis.com/translate_a/single?client=gtx&sl=${sl}&tl=${targetLang}&dt=t&q=${encodeURIComponent(input)}`
             )
-            const data = await res.json()
-            const translated = data[0]?.map((item: any) => item[0]).join("") || ""
-            const detected = data[2] || ""
+            const data: unknown = await res.json()
+            const translated =
+                Array.isArray(data) && Array.isArray(data[0])
+                    ? data[0]
+                          .map((item) =>
+                              Array.isArray(item) &&
+                              typeof item[0] === "string"
+                                  ? item[0]
+                                  : ""
+                          )
+                          .join("")
+                    : ""
+            const detected =
+                Array.isArray(data) && typeof data[2] === "string"
+                    ? data[2]
+                    : ""
 
             setOutput(translated)
             if (sourceLang === "auto" && detected) {
@@ -98,12 +111,14 @@ export default function TranslatePro({ asIconButton = false }: TranslateProProps
         } finally {
             setLoading(false)
         }
-    }
+    }, [input, sourceLang, targetLang])
 
     React.useEffect(() => {
-        const timer = setTimeout(translateText, 600)
+        const timer = window.setTimeout(() => {
+            void translateText()
+        }, 600)
         return () => clearTimeout(timer)
-    }, [input, sourceLang, targetLang])
+    }, [translateText])
 
     const speak = (text: string, lang: string) => {
         if (!text) return
@@ -153,7 +168,7 @@ export default function TranslatePro({ asIconButton = false }: TranslateProProps
                         />
 
                         <Card
-                            className="fixed bottom-24 left-1/2 -translate-x-1/2 w-full max-w-3xl px-4
+                            className="fixed inset-x-0 bottom-20 mx-auto max-h-[calc(100dvh-6rem)] w-[calc(100%-2rem)] max-w-3xl overflow-y-auto
                           bg-black/95 backdrop-blur-2xl border border-white/20 shadow-2xl
                           animate-in slide-in-from-bottom-8 duration-300"
                             style={{ zIndex: 341 }}
@@ -176,9 +191,9 @@ export default function TranslatePro({ asIconButton = false }: TranslateProProps
                                 </div>
 
                                 {/* Chọn ngôn ngữ */}
-                                <div className="flex items-center gap-3">
+                                <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
                                     <Select value={sourceLang} onValueChange={(v) => setSourceLang(v as LangCode)}>
-                                        <SelectTrigger className="w-36 bg-white/20 border-white/30 text-white/90">
+                                        <SelectTrigger className="w-full bg-white/20 border-white/30 text-white/90 sm:w-36">
                                             <SelectValue />
                                         </SelectTrigger>
                                         <SelectContent className="bg-white/95 dark:bg-gray-900/95">
@@ -196,7 +211,7 @@ export default function TranslatePro({ asIconButton = false }: TranslateProProps
                                     <Button
                                         size="icon"
                                         variant="outline"
-                                        className="bg-white/20 border-white/30 hover:bg-white/30"
+                                        className="bg-white/20 border-white/30 hover:bg-white/30 sm:flex-shrink-0"
                                         onClick={swapLanguages}
                                         disabled={sourceLang === "auto"}
                                     >
@@ -204,7 +219,7 @@ export default function TranslatePro({ asIconButton = false }: TranslateProProps
                                     </Button>
 
                                     <Select value={targetLang} onValueChange={(v) => setTargetLang(v as LangCode)}>
-                                        <SelectTrigger className="w-36 bg-white/20 border-white/30 text-white/90">
+                                        <SelectTrigger className="w-full bg-white/20 border-white/30 text-white/90 sm:w-36">
                                             <SelectValue />
                                         </SelectTrigger>
                                         <SelectContent className="bg-white/95 dark:bg-gray-900/95">
@@ -231,7 +246,7 @@ export default function TranslatePro({ asIconButton = false }: TranslateProProps
                                         placeholder="Nhập văn bản cần dịch..."
                                         value={input}
                                         onChange={(e) => setInput(e.target.value)}
-                                        className="min-h-36 resize-none bg-white/15 border-white/25
+                                        className="min-h-28 resize-none bg-white/15 border-white/25 sm:min-h-36
                                      text-white placeholder:text-white/50 focus:ring-2
                                      focus:ring-blue-400/50 focus:border-blue-400
                                      rounded-xl p-4"
@@ -249,7 +264,7 @@ export default function TranslatePro({ asIconButton = false }: TranslateProProps
                                 </div>
 
                                 {/* Output */}
-                                <div className="bg-white/15 rounded-xl p-5 min-h-36 max-h-48 overflow-y-auto">
+                                <div className="min-h-28 max-h-48 overflow-y-auto rounded-xl bg-white/15 p-5 sm:min-h-36">
                                     {loading ? (
                                         <p className="text-sm text-white/70 animate-pulse">Đang dịch...</p>
                                     ) : output ? (
