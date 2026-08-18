@@ -13,10 +13,22 @@ export default function sitemap(): MetadataRoute.Sitemap {
             priority: 1,
         },
         {
-            url: `${siteUrl}/bang-xep-hang`,
+            url: `${siteUrl}/pomodoro`,
+            lastModified: new Date(),
+            changeFrequency: "daily",
+            priority: 0.9,
+        },
+        {
+            url: `${siteUrl}/pomodoro/bang-xep-hang`,
             lastModified: new Date(),
             changeFrequency: "daily",
             priority: 0.7,
+        },
+        {
+            url: `${siteUrl}/game`,
+            lastModified: new Date(),
+            changeFrequency: "weekly",
+            priority: 0.8,
         },
     ];
 }

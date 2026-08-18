@@ -1,12 +1,13 @@
 // components/GameHub.tsx
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import {
     AnimatePresence,
     motion,
     useReducedMotion,
 } from "framer-motion";
+import { useRouter } from "next/navigation";
 import {
     ArrowLeft,
     BookOpenText,
@@ -161,8 +162,13 @@ function GameCard({
     );
 }
 
-export default function GameHub() {
-    const [isOpen, setIsOpen] = useState(false);
+interface GameHubProps {
+    standalone?: boolean;
+}
+
+export default function GameHub({ standalone = false }: GameHubProps) {
+    const router = useRouter();
+    const [isOpen, setIsOpen] = useState(standalone);
     const [selectedGame, setSelectedGame] =
         useState<SelectedGame>("none");
     const [selectedGrade, setSelectedGrade] = useState(() => {
@@ -181,14 +187,19 @@ export default function GameHub() {
 
     const reduceMotion = useReducedMotion();
 
-    const closeGameHub = () => {
+    const closeGameHub = useCallback(() => {
+        if (standalone) {
+            router.push("/");
+            return;
+        }
+
         setIsOpen(false);
 
         // Đợi modal đóng xong rồi mới trở về menu.
         window.setTimeout(() => {
             setSelectedGame("none");
         }, 200);
-    };
+    }, [router, standalone]);
 
     /*
      * Khóa scroll của trang khi Game Hub mở.
@@ -228,7 +239,7 @@ export default function GameHub() {
         return () => {
             window.removeEventListener("keydown", handleKeyDown);
         };
-    }, [isOpen]);
+    }, [closeGameHub, isOpen]);
 
     const title =
         selectedGame === "math"
@@ -251,30 +262,31 @@ export default function GameHub() {
 
     return (
         <>
-            {/* Nút trên BottomBar */}
-            <button
-                type="button"
-                onClick={() => setIsOpen(true)}
-                aria-label="Mở trò chơi học tập"
-                aria-expanded={isOpen}
-                className="
-                    group relative flex h-12 w-12
-                    items-center justify-center rounded-xl
-                    border border-white/20 bg-white/10
-                    text-white/70 backdrop-blur-xl
-                    transition-all duration-200
-                    hover:scale-105 hover:bg-white/20
-                    hover:text-white
-                    focus:outline-none
-                    focus-visible:ring-2
-                    focus-visible:ring-white/60
-                "
-            >
-                <Gamepad2
-                    size={23}
-                    aria-hidden="true"
-                />
-            </button>
+            {!standalone && (
+                <button
+                    type="button"
+                    onClick={() => setIsOpen(true)}
+                    aria-label="Mở trò chơi học tập"
+                    aria-expanded={isOpen}
+                    className="
+                        group relative flex h-12 w-12
+                        items-center justify-center rounded-xl
+                        border border-white/20 bg-white/10
+                        text-white/70 backdrop-blur-xl
+                        transition-all duration-200
+                        hover:scale-105 hover:bg-white/20
+                        hover:text-white
+                        focus:outline-none
+                        focus-visible:ring-2
+                        focus-visible:ring-white/60
+                    "
+                >
+                    <Gamepad2
+                        size={23}
+                        aria-hidden="true"
+                    />
+                </button>
+            )}
 
             <AnimatePresence>
                 {isOpen && (

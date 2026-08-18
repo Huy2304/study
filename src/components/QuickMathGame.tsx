@@ -752,7 +752,7 @@ export default function QuickMathGame({
                                     để ghi tên vào bảng xếp hạng ngày.
                                 </p>
                                 <Link
-                                    href="/bang-xep-hang?tab=daily"
+                                    href="/pomodoro/bang-xep-hang?tab=daily"
                                     className="mt-2 inline-flex font-medium text-cyan-200 underline underline-offset-4 hover:text-cyan-100"
                                 >
                                     Xem bảng hôm nay

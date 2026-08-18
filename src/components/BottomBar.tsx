@@ -20,11 +20,6 @@ import { MusicTooltip } from "@/components/MusicTooltip";
 import { useFocusMode } from "@/lib/FocusModeContext";
 import { Z_INDEX } from "@/lib/zIndexManager";
 
-const GameHub = dynamic(() => import("@/components/GameHub"), {
-    ssr: false,
-    loading: () => <ToolLoading ariaLabel="Đang tải trò chơi" />,
-});
-
 const MiniYoutubePlayer = dynamic(
     () => import("@/components/MiniYoutubePlayer"),
     {
@@ -176,14 +171,9 @@ function BottomBar({ items, actionButton }: BottomBarProps) {
                 priority: 2,
             },
             {
-                id: "games",
-                component: <GameHub />,
-                priority: 3,
-            },
-            {
                 id: "more-tools",
                 component: <MoreTools />,
-                priority: 4,
+                priority: 3,
             },
         ],
         []

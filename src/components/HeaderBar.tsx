@@ -96,7 +96,7 @@ export default function HeaderBar() {
                     <Tooltip>
                         <TooltipTrigger asChild>
                             <Link
-                                href="/bang-xep-hang"
+                                href="/pomodoro/bang-xep-hang"
                                 className="relative flex h-11 w-11 items-center justify-center rounded-lg text-yellow-300 transition hover:bg-white/10 hover:text-yellow-200 focus:outline-none focus:ring-2 focus:ring-white/50"
                                 aria-label="Mở bảng xếp hạng"
                             >
