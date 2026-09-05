@@ -6,10 +6,12 @@ import {
     CheckSquare,
     Gamepad2,
     LayoutDashboard,
+    Newspaper,
     NotebookPen,
     Users,
 } from "lucide-react";
 
+import AdminLogoutButton from "@/components/admin/AdminLogoutButton";
 import { db } from "@/lib/db";
 import {
     gameRuns,
@@ -108,14 +110,27 @@ export default async function AdminPage() {
                         Đăng nhập với tư cách {admin.email}
                     </p>
                 </div>
-                <Link
-                    href="/"
-                    className="inline-flex w-fit items-center gap-2 rounded-xl border border-white/15 px-4 py-2.5 text-sm font-semibold text-white/80 transition hover:bg-white/10 hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-white/70"
-                >
-                    Xem website
-                    <ArrowUpRight size={17} aria-hidden="true" />
-                </Link>
+                <div className="flex flex-wrap items-center gap-2">
+                    <Link
+                        href="/"
+                        className="inline-flex w-fit items-center gap-2 rounded-xl border border-white/15 px-4 py-2.5 text-sm font-semibold text-white/80 transition hover:bg-white/10 hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-white/70"
+                    >
+                        Xem website
+                        <ArrowUpRight size={17} aria-hidden="true" />
+                    </Link>
+                    <AdminLogoutButton />
+                </div>
             </header>
+
+            <div className="mt-6">
+                <Link
+                    href="/admin/tin-tuc"
+                    className="inline-flex items-center gap-2 rounded-xl bg-cyan-300 px-4 py-2.5 text-sm font-semibold text-cyan-950 transition hover:bg-cyan-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-100"
+                >
+                    <Newspaper size={17} aria-hidden="true" />
+                    Quản lý tin tức
+                </Link>
+            </div>
 
             <main className="py-8">
                 <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">

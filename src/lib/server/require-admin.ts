@@ -1,31 +1,20 @@
 import { notFound, redirect } from "next/navigation";
 
-import { getCurrentUser } from "@/lib/server/require-user";
-
-function getAdminEmails() {
-    return new Set(
-        (process.env.ADMIN_EMAILS ?? "")
-            .split(",")
-            .map((email) => email.trim().toLowerCase())
-            .filter(Boolean)
-    );
-}
+import {
+    getConfiguredAdminEmail,
+    hasAdminSession,
+} from "@/lib/server/admin-session";
 
 export async function requireAdmin() {
-    const user = await getCurrentUser();
+    const adminEmail = getConfiguredAdminEmail();
 
-    if (!user) {
-        redirect("/login");
-    }
-
-    const adminEmails = getAdminEmails();
-
-    if (
-        adminEmails.size === 0 ||
-        !adminEmails.has(user.email.trim().toLowerCase())
-    ) {
+    if (!adminEmail) {
         notFound();
     }
 
-    return user;
+    if (!(await hasAdminSession())) {
+        redirect("/admin/login");
+    }
+
+    return { email: adminEmail };
 }

@@ -15,6 +15,13 @@
       "when": 1786210371018,
       "tag": "0001_flowery_ma_gnuci",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1788620361204,
+      "tag": "0002_lethal_sharon_carter",
+      "breakpoints": true
     }
   ]
 }

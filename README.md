@@ -37,9 +37,23 @@ Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/bui
 
 ## Quản trị
 
-Trang `/admin` chỉ cho phép các tài khoản có email trong biến môi trường
-`ADMIN_EMAILS`. Khai báo nhiều email bằng dấu phẩy, ví dụ:
+Trang `/admin` chỉ cho phép đúng tài khoản có email trong biến môi trường
+`ADMIN_EMAIL`. Phiên quản trị độc lập với tài khoản người dùng thường và dùng
+`ADMIN_PASSWORD` để đăng nhập:
 
 ```env
-ADMIN_EMAILS=admin@example.com,owner@example.com
+ADMIN_EMAIL=admin@example.com
+ADMIN_PASSWORD=replace-with-the-admin-password
 ```
+
+Khu vực quản lý bài viết nằm ở `/admin/tin-tuc`. Bài viết đã xuất bản được hiển
+thị tại `/tin-tuc`; trường `affiliateUrl` sẽ tạo nút liên kết có thuộc tính
+`sponsored nofollow` ở cuối bài.
+
+Endpoint `/api/keep-alive` chạy truy vấn `SELECT 1` để giữ kết nối database hoạt
+động. Khi deploy trên Vercel, khai báo biến môi trường `CRON_SECRET`; lịch trong
+`vercel.json` sẽ gọi endpoint mỗi ngày. Nếu deploy ở nền tảng khác, dùng cron
+bên ngoài gọi URL này với header `Authorization: Bearer <CRON_SECRET>`.
+
+GitHub Pages chỉ phục vụ file tĩnh và không chạy được các API route hoặc truy
+vấn PostgreSQL của ứng dụng này.

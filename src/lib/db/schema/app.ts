@@ -210,3 +210,65 @@ export const todos = pgTable(
         ),
     ]
 );
+
+export const newsPosts = pgTable(
+    "news_posts",
+    {
+        id: uuid("id")
+            .defaultRandom()
+            .primaryKey(),
+
+        slug: varchar("slug", {
+            length: 180,
+        })
+            .notNull()
+            .unique(),
+
+        title: varchar("title", {
+            length: 180,
+        }).notNull(),
+
+        excerpt: varchar("excerpt", {
+            length: 320,
+        })
+            .default("")
+            .notNull(),
+
+        content: text("content").notNull(),
+
+        coverImage: text("cover_image"),
+
+        affiliateUrl: text("affiliate_url"),
+
+        isPublished: boolean("is_published")
+            .default(false)
+            .notNull(),
+
+        publishedAt: timestamp("published_at", {
+            withTimezone: true,
+            mode: "date",
+        }),
+
+        createdAt: timestamp("created_at", {
+            withTimezone: true,
+            mode: "date",
+        })
+            .defaultNow()
+            .notNull(),
+
+        updatedAt: timestamp("updated_at", {
+            withTimezone: true,
+            mode: "date",
+        })
+            .defaultNow()
+            .$onUpdate(() => new Date())
+            .notNull(),
+    },
+    (table) => [
+        index("news_posts_published_idx").on(
+            table.isPublished,
+            table.publishedAt
+        ),
+        index("news_posts_created_at_idx").on(table.createdAt),
+    ]
+);

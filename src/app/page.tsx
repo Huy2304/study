@@ -52,6 +52,7 @@ const navigationCards = [
         id: "tin-tuc",
         title: "Tin tức",
         icon: BookOpen,
+        href: "/tin-tuc",
         accent: "text-violet-200",
         panel: (
             <>
@@ -67,9 +68,13 @@ const navigationCards = [
                         mới của StudyHay sẽ được đăng tại đây.
                     </p>
                 </div>
-                <span className="w-fit rounded-full border border-violet-200/20 bg-violet-300/10 px-3 py-1.5 text-sm font-medium text-violet-100">
-                    Đang chuẩn bị nội dung
-                </span>
+                <Link
+                    href="/tin-tuc"
+                    className="inline-flex w-fit items-center gap-2 rounded-xl border border-violet-200/25 bg-violet-200/10 px-4 py-2.5 text-sm font-semibold text-violet-100 transition hover:bg-violet-200/20 focus:outline-none focus-visible:ring-2 focus-visible:ring-violet-100"
+                >
+                    Đọc tin tức
+                    <ArrowRight size={17} aria-hidden="true" />
+                </Link>
             </>
         ),
     },
