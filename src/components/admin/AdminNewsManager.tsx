@@ -25,6 +25,7 @@ type NewsForm = {
     coverImage: string;
     affiliateUrl: string;
     isPublished: boolean;
+    category: string;
 };
 
 const emptyForm: NewsForm = {
@@ -35,6 +36,7 @@ const emptyForm: NewsForm = {
     coverImage: "",
     affiliateUrl: "",
     isPublished: false,
+    category: "Khác",
 };
 
 function getFormFromPost(post: NewsPost): NewsForm {
@@ -46,6 +48,7 @@ function getFormFromPost(post: NewsPost): NewsForm {
         coverImage: post.coverImage ?? "",
         affiliateUrl: post.affiliateUrl ?? "",
         isPublished: post.isPublished,
+        category: post.category ?? "Khác",
     };
 }
 
@@ -73,6 +76,39 @@ export default function AdminNewsManager({
 
     function updateField<K extends keyof NewsForm>(field: K, value: NewsForm[K]) {
         setForm((current) => ({ ...current, [field]: value }));
+    }
+
+    async function handleImageUpload(event: React.ChangeEvent<HTMLInputElement>) {
+        const file = event.target.files?.[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            const img = new window.Image();
+            img.onload = () => {
+                const canvas = document.createElement("canvas");
+                let { width, height } = img;
+                const max = 1200;
+                if (width > max || height > max) {
+                    if (width > height) {
+                        height = Math.round((height * max) / width);
+                        width = max;
+                    } else {
+                        width = Math.round((width * max) / height);
+                        height = max;
+                    }
+                }
+                canvas.width = width;
+                canvas.height = height;
+                const ctx = canvas.getContext("2d");
+                if (!ctx) return;
+                ctx.drawImage(img, 0, 0, width, height);
+                const dataUrl = canvas.toDataURL("image/webp", 0.85);
+                updateField("coverImage", dataUrl);
+            };
+            img.src = e.target?.result as string;
+        };
+        reader.readAsDataURL(file);
     }
 
     function startNewPost() {
@@ -206,6 +242,21 @@ export default function AdminNewsManager({
                     </label>
 
                     <label className="block">
+                        <span className="text-sm text-white/65">Thể loại</span>
+                        <select
+                            value={form.category}
+                            onChange={(event) => updateField("category", event.target.value)}
+                            className="mt-2 w-full rounded-xl border border-white/10 bg-white/[0.06] px-4 py-3 text-white outline-none focus:border-cyan-400/60 [&>option]:bg-zinc-900"
+                        >
+                            <option value="Khác">Khác</option>
+                            <option value="Esports">Esports</option>
+                            <option value="Thời sự">Thời sự</option>
+                            <option value="Học tập">Học tập</option>
+                            <option value="Giải trí">Giải trí</option>
+                        </select>
+                    </label>
+
+                    <label className="block">
                         <span className="text-sm text-white/65">Mô tả ngắn</span>
                         <textarea
                             value={form.excerpt}
@@ -230,16 +281,22 @@ export default function AdminNewsManager({
                         />
                     </label>
 
-                    <label className="block">
-                        <span className="text-sm text-white/65">Ảnh đại diện (URL, không bắt buộc)</span>
-                        <input
-                            type="text"
-                            value={form.coverImage}
-                            onChange={(event) => updateField("coverImage", event.target.value)}
-                            className="mt-2 w-full rounded-xl border border-white/10 bg-white/[0.06] px-4 py-3 text-white outline-none placeholder:text-white/25 focus:border-cyan-400/60"
-                            placeholder="https://... hoặc /images/..."
-                        />
-                    </label>
+                    <div className="block">
+                        <span className="text-sm text-white/65">Ảnh đại diện (Tải lên hoặc URL)</span>
+                        <div className="mt-2 flex gap-3">
+                            <input
+                                type="text"
+                                value={form.coverImage}
+                                onChange={(event) => updateField("coverImage", event.target.value)}
+                                className="w-full rounded-xl border border-white/10 bg-white/[0.06] px-4 py-3 text-white outline-none placeholder:text-white/25 focus:border-cyan-400/60"
+                                placeholder="https://... hoặc data:..."
+                            />
+                            <label className="flex flex-shrink-0 cursor-pointer items-center justify-center rounded-xl bg-white/10 px-4 py-3 text-sm font-semibold text-white transition hover:bg-white/20">
+                                Chọn ảnh
+                                <input type="file" accept="image/*" className="hidden" onChange={handleImageUpload} />
+                            </label>
+                        </div>
+                    </div>
 
                     <label className="block">
                         <span className="text-sm text-white/65">Link affiliate (https://)</span>
@@ -309,7 +366,7 @@ export default function AdminNewsManager({
                                     <div className="min-w-0">
                                         <h3 className="line-clamp-2 font-medium text-white">{post.title}</h3>
                                         <p className="mt-1 text-xs text-white/45">
-                                            {post.isPublished ? "Đã xuất bản" : "Bản nháp"} · {formatNewsDate(post.publishedAt ?? post.createdAt)}
+                                            {post.category} · {post.isPublished ? "Đã xuất bản" : "Bản nháp"} · {formatNewsDate(post.publishedAt ?? post.createdAt)}
                                         </p>
                                     </div>
                                     <span className={`flex-shrink-0 rounded-full px-2 py-1 text-[11px] font-semibold ${post.isPublished ? "bg-emerald-300/10 text-emerald-200" : "bg-amber-300/10 text-amber-200"}`}>

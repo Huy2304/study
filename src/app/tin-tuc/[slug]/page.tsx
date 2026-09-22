@@ -7,6 +7,7 @@ import { notFound } from "next/navigation";
 import { db } from "@/lib/db";
 import { newsPosts } from "@/lib/db/schema";
 import { formatNewsDate } from "@/lib/news";
+import NewsComments from "@/components/news/NewsComments";
 
 export const dynamic = "force-dynamic";
 
@@ -97,6 +98,9 @@ export default async function NewsDetailPage({ params }: NewsDetailPageProps) {
                         )}
                     </div>
                 </article>
+
+                {/* Phần bình luận */}
+                <NewsComments slug={post.slug} />
             </main>
         </div>
     );

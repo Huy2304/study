@@ -11,6 +11,7 @@ import {
     useBackground,
 } from "@/lib/BackgroundContext";
 import { FocusModeProvider } from "@/lib/FocusModeContext";
+import KeepAlive from "@/components/KeepAlive";
 
 interface BackgroundMediaProps {
     src: string;
@@ -148,6 +149,7 @@ export default function AppShell({
     return (
         <BackgroundProvider>
             <DynamicBackground />
+            <KeepAlive />
 
             <main className="relative z-10 flex min-h-screen flex-col">
                 <ErrorBoundary>

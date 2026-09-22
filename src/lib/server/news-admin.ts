@@ -12,6 +12,7 @@ export type NewsInput = {
     coverImage: string | null;
     affiliateUrl: string | null;
     isPublished: boolean;
+    category: string;
 };
 
 function readString(value: unknown, maxLength: number) {
@@ -51,10 +52,15 @@ export function parseNewsInput(body: Record<string, unknown>): NewsInput | strin
         return "Link affiliate phải bắt đầu bằng http:// hoặc https://";
     }
 
-    const coverInput = readString(body.coverImage, 2_048);
-    const coverImage = readUrl(coverInput, { allowLocal: true });
-    if (coverInput && !coverImage) {
-        return "Ảnh đại diện phải là URL http(s) hoặc đường dẫn bắt đầu bằng /";
+    const coverInput = typeof body.coverImage === "string" ? body.coverImage : "";
+    let coverImage: string | null = null;
+    if (coverInput.startsWith("data:image/")) {
+        coverImage = coverInput.slice(0, 5_000_000); // 5MB limit
+    } else if (coverInput) {
+        coverImage = readUrl(coverInput.slice(0, 2048), { allowLocal: true });
+        if (!coverImage) {
+            return "Ảnh đại diện phải là URL http(s), file tải lên hoặc đường dẫn /";
+        }
     }
 
     return {
@@ -65,6 +71,7 @@ export function parseNewsInput(body: Record<string, unknown>): NewsInput | strin
         coverImage,
         affiliateUrl,
         isPublished: body.isPublished === true,
+        category: readString(body.category, 50) || "Khác",
     };
 }
 

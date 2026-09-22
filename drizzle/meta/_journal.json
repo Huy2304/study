@@ -22,6 +22,27 @@
       "when": 1788620361204,
       "tag": "0002_lethal_sharon_carter",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1790059025065,
+      "tag": "0003_equal_dakota_north",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1790060930654,
+      "tag": "0004_oval_guardsmen",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1790061217732,
+      "tag": "0005_nasty_scourge",
+      "breakpoints": true
     }
   ]
 }

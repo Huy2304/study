@@ -10,7 +10,7 @@ import {
     uuid,
     varchar,
 } from "drizzle-orm/pg-core";
-import { sql } from "drizzle-orm";
+import { relations, sql } from "drizzle-orm";
 
 import { user } from "./auth";
 
@@ -224,6 +224,12 @@ export const newsPosts = pgTable(
             .notNull()
             .unique(),
 
+        category: varchar("category", {
+            length: 50,
+        })
+            .default("Khác")
+            .notNull(),
+
         title: varchar("title", {
             length: 180,
         }).notNull(),
@@ -272,3 +278,55 @@ export const newsPosts = pgTable(
         index("news_posts_created_at_idx").on(table.createdAt),
     ]
 );
+
+export const newsComments = pgTable(
+    "news_comments",
+    {
+        id: uuid("id")
+            .defaultRandom()
+            .primaryKey(),
+
+        postId: uuid("post_id")
+            .notNull()
+            .references(() => newsPosts.id, {
+                onDelete: "cascade",
+            }),
+
+        userId: text("user_id")
+            .references(() => user.id, {
+                onDelete: "cascade",
+            }),
+
+        nickname: varchar("nickname", {
+            length: 50,
+        }),
+
+        content: text("content").notNull(),
+
+        createdAt: timestamp("created_at", {
+            withTimezone: true,
+            mode: "date",
+        })
+            .defaultNow()
+            .notNull(),
+    },
+    (table) => [
+        index("news_comments_post_id_idx").on(table.postId),
+        index("news_comments_created_at_idx").on(table.createdAt),
+    ]
+);
+
+export const newsPostsRelations = relations(newsPosts, ({ many }) => ({
+    comments: many(newsComments),
+}));
+
+export const newsCommentsRelations = relations(newsComments, ({ one }) => ({
+    post: one(newsPosts, {
+        fields: [newsComments.postId],
+        references: [newsPosts.id],
+    }),
+    user: one(user, {
+        fields: [newsComments.userId],
+        references: [user.id],
+    }),
+}));

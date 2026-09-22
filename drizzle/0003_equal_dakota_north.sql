@@ -1,0 +1,1 @@
+ALTER TABLE "news_posts" ADD COLUMN "category" varchar(50) DEFAULT 'Khác' NOT NULL;
