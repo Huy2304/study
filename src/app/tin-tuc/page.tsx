@@ -7,7 +7,7 @@ import { db } from "@/lib/db";
 import { newsPosts } from "@/lib/db/schema";
 import { formatNewsDate } from "@/lib/news";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 60;
 
 export const metadata: Metadata = {
     title: "Tin tức",

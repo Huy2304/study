@@ -12,18 +12,37 @@ import {
     List,
     ListOrdered,
     Image as ImageIcon,
+    LoaderCircle,
 } from "lucide-react";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import { uploadImage } from "@/lib/supabase-client";
 
 const MenuBar = ({ editor }: { editor: any }) => {
+    const [isUploading, setIsUploading] = useState(false);
     if (!editor) {
         return null;
     }
 
-    const addImage = () => {
-        const url = window.prompt("Nhập URL của ảnh (hoặc Data URL):");
+    const addImageFromUrl = () => {
+        const url = window.prompt("Nhập URL của ảnh:");
         if (url) {
             editor.chain().focus().setImage({ src: url }).run();
+        }
+    };
+
+    const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+        const file = event.target.files?.[0];
+        if (!file) return;
+
+        setIsUploading(true);
+        try {
+            const url = await uploadImage(file);
+            editor.chain().focus().setImage({ src: url }).run();
+        } catch (error) {
+            alert("Lỗi tải ảnh lên. Hãy kiểm tra lại cấu hình Supabase Storage.");
+        } finally {
+            setIsUploading(false);
+            event.target.value = "";
         }
     };
 
@@ -94,14 +113,13 @@ const MenuBar = ({ editor }: { editor: any }) => {
 
             <div className="mx-1 h-5 w-px bg-white/10"></div>
 
-            <button
-                type="button"
-                onClick={addImage}
-                className="rounded p-2 text-white/60 transition hover:bg-white/10 hover:text-white"
-                title="Chèn ảnh"
+            <label
+                className={`flex cursor-pointer items-center justify-center rounded p-2 transition ${isUploading ? "opacity-50" : "text-white/60 hover:bg-white/10 hover:text-white"}`}
+                title="Tải ảnh lên từ máy"
             >
-                <ImageIcon size={16} />
-            </button>
+                {isUploading ? <LoaderCircle size={16} className="animate-spin" /> : <ImageIcon size={16} />}
+                <input type="file" accept="image/*" className="hidden" onChange={handleFileChange} disabled={isUploading} />
+            </label>
         </div>
     );
 };
@@ -114,6 +132,7 @@ export default function TipTapEditor({
     onChange: (html: string) => void;
 }) {
     const editor = useEditor({
+        immediatelyRender: false,
         extensions: [
             StarterKit,
             Image.configure({

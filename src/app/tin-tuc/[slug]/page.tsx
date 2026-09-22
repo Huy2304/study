@@ -9,7 +9,7 @@ import { newsPosts } from "@/lib/db/schema";
 import { formatNewsDate } from "@/lib/news";
 import NewsComments from "@/components/news/NewsComments";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 60;
 
 type NewsDetailPageProps = {
     params: Promise<{ slug: string }>;

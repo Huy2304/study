@@ -15,6 +15,7 @@ import {
 import type { newsPosts } from "@/lib/db/schema";
 import { formatNewsDate } from "@/lib/news";
 import TipTapEditor from "./TipTapEditor";
+import { uploadImage } from "@/lib/supabase-client";
 
 type NewsPost = typeof newsPosts.$inferSelect;
 
@@ -71,6 +72,7 @@ export default function AdminNewsManager({
     const [form, setForm] = useState<NewsForm>(emptyForm);
     const [editingId, setEditingId] = useState<string | null>(null);
     const [isSaving, setIsSaving] = useState(false);
+    const [isUploading, setIsUploading] = useState(false);
     const [deletingId, setDeletingId] = useState<string | null>(null);
     const [message, setMessage] = useState("");
     const [error, setError] = useState("");
@@ -83,33 +85,20 @@ export default function AdminNewsManager({
         const file = event.target.files?.[0];
         if (!file) return;
 
-        const reader = new FileReader();
-        reader.onload = (e) => {
-            const img = new window.Image();
-            img.onload = () => {
-                const canvas = document.createElement("canvas");
-                let { width, height } = img;
-                const max = 1200;
-                if (width > max || height > max) {
-                    if (width > height) {
-                        height = Math.round((height * max) / width);
-                        width = max;
-                    } else {
-                        width = Math.round((width * max) / height);
-                        height = max;
-                    }
-                }
-                canvas.width = width;
-                canvas.height = height;
-                const ctx = canvas.getContext("2d");
-                if (!ctx) return;
-                ctx.drawImage(img, 0, 0, width, height);
-                const dataUrl = canvas.toDataURL("image/webp", 0.85);
-                updateField("coverImage", dataUrl);
-            };
-            img.src = e.target?.result as string;
-        };
-        reader.readAsDataURL(file);
+        setIsUploading(true);
+        setError("");
+        
+        try {
+            const url = await uploadImage(file);
+            updateField("coverImage", url);
+            setMessage("Đã tải ảnh lên thành công");
+        } catch (error) {
+            console.error(error);
+            setError("Lỗi tải ảnh: Hãy đảm bảo bạn đã tạo Bucket 'uploads' (Public) trong Supabase Storage");
+        } finally {
+            setIsUploading(false);
+            event.target.value = "";
+        }
     }
 
     function startNewPost() {
@@ -287,9 +276,9 @@ export default function AdminNewsManager({
                                 className="w-full rounded-xl border border-white/10 bg-white/[0.06] px-4 py-3 text-white outline-none placeholder:text-white/25 focus:border-cyan-400/60"
                                 placeholder="https://... hoặc data:..."
                             />
-                            <label className="flex flex-shrink-0 cursor-pointer items-center justify-center rounded-xl bg-white/10 px-4 py-3 text-sm font-semibold text-white transition hover:bg-white/20">
-                                Chọn ảnh
-                                <input type="file" accept="image/*" className="hidden" onChange={handleImageUpload} />
+                            <label className={`flex flex-shrink-0 cursor-pointer items-center justify-center rounded-xl px-4 py-3 text-sm font-semibold text-white transition ${isUploading ? "bg-white/5 opacity-50" : "bg-white/10 hover:bg-white/20"}`}>
+                                {isUploading ? "Đang tải..." : "Chọn ảnh"}
+                                <input type="file" accept="image/*" className="hidden" onChange={handleImageUpload} disabled={isUploading} />
                             </label>
                         </div>
                     </div>
