@@ -14,6 +14,7 @@ import {
 
 import type { newsPosts } from "@/lib/db/schema";
 import { formatNewsDate } from "@/lib/news";
+import TipTapEditor from "./TipTapEditor";
 
 type NewsPost = typeof newsPosts.$inferSelect;
 
@@ -268,18 +269,13 @@ export default function AdminNewsManager({
                         />
                     </label>
 
-                    <label className="block">
-                        <span className="text-sm text-white/65">Nội dung</span>
-                        <textarea
-                            value={form.content}
-                            onChange={(event) => updateField("content", event.target.value)}
-                            maxLength={100000}
-                            rows={12}
-                            required
-                            className="mt-2 w-full resize-y rounded-xl border border-white/10 bg-white/[0.06] px-4 py-3 leading-7 text-white outline-none placeholder:text-white/25 focus:border-cyan-400/60"
-                            placeholder="Viết nội dung bài đăng..."
+                    <div className="block">
+                        <span className="text-sm text-white/65">Nội dung (HTML)</span>
+                        <TipTapEditor
+                            content={form.content}
+                            onChange={(html) => updateField("content", html)}
                         />
-                    </label>
+                    </div>
 
                     <div className="block">
                         <span className="text-sm text-white/65">Ảnh đại diện (Tải lên hoặc URL)</span>

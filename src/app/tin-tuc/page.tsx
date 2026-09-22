@@ -17,10 +17,13 @@ export const metadata: Metadata = {
 export default async function NewsPage({
     searchParams,
 }: {
-    searchParams: Promise<{ category?: string }>;
+    searchParams: Promise<{ category?: string; page?: string }>;
 }) {
     const params = await searchParams;
     const category = params.category;
+    const page = parseInt(params.page || "1", 10);
+    const pageSize = 12;
+    const offset = (page - 1) * pageSize;
 
     const condition = category
         ? and(eq(newsPosts.isPublished, true), eq(newsPosts.category, category))
@@ -30,7 +33,12 @@ export default async function NewsPage({
         .select()
         .from(newsPosts)
         .where(condition)
-        .orderBy(desc(newsPosts.publishedAt), desc(newsPosts.createdAt));
+        .orderBy(desc(newsPosts.publishedAt), desc(newsPosts.createdAt))
+        .limit(pageSize + 1) // Lấy thêm 1 bài để check xem có trang tiếp theo không
+        .offset(offset);
+
+    const hasNextPage = posts.length > pageSize;
+    const displayPosts = posts.slice(0, pageSize);
 
     const categories = ["Esports", "Thời sự", "Học tập", "Giải trí", "Khác"];
 
@@ -78,7 +86,7 @@ export default async function NewsPage({
                     </section>
                 ) : (
                     <section className="grid gap-5 md:grid-cols-2">
-                        {posts.map((post) => (
+                        {displayPosts.map((post) => (
                             <Link
                                 key={post.id}
                                 href={`/tin-tuc/${post.slug}`}
@@ -118,6 +126,35 @@ export default async function NewsPage({
                             </Link>
                         ))}
                     </section>
+                )}
+
+                {/* Pagination Controls */}
+                {(page > 1 || hasNextPage) && (
+                    <div className="mt-10 flex items-center justify-center gap-4">
+                        {page > 1 && (
+                            <Link
+                                href={`/tin-tuc?${new URLSearchParams({
+                                    ...(category && { category }),
+                                    page: (page - 1).toString(),
+                                }).toString()}`}
+                                className="rounded-xl border border-white/10 bg-zinc-900/50 px-5 py-3 text-sm font-semibold text-white transition hover:bg-zinc-800"
+                            >
+                                Trang trước
+                            </Link>
+                        )}
+                        <span className="text-sm font-semibold text-white/40">Trang {page}</span>
+                        {hasNextPage && (
+                            <Link
+                                href={`/tin-tuc?${new URLSearchParams({
+                                    ...(category && { category }),
+                                    page: (page + 1).toString(),
+                                }).toString()}`}
+                                className="rounded-xl border border-white/10 bg-zinc-900/50 px-5 py-3 text-sm font-semibold text-white transition hover:bg-zinc-800"
+                            >
+                                Trang tiếp theo
+                            </Link>
+                        )}
+                    </div>
                 )}
             </main>
         </div>

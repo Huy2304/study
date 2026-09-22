@@ -28,6 +28,12 @@ export async function generateMetadata({
     return {
         title: post?.title ?? "Tin tức",
         description: post?.excerpt || undefined,
+        openGraph: {
+            title: post?.title ?? "Tin tức",
+            description: post?.excerpt || undefined,
+            type: "article",
+            images: post?.coverImage ? [{ url: post.coverImage }] : undefined,
+        },
     };
 }
 
@@ -76,9 +82,10 @@ export default async function NewsDetailPage({ params }: NewsDetailPageProps) {
                                 {post.excerpt}
                             </p>
                         )}
-                        <div className="mt-8 whitespace-pre-wrap break-words text-[1.05rem] leading-8 text-white/80">
-                            {post.content}
-                        </div>
+                        <div 
+                            className="mt-8 whitespace-pre-wrap break-words text-[1.05rem] leading-8 text-white/80 prose prose-invert prose-cyan max-w-none prose-img:rounded-lg prose-img:mx-auto"
+                            dangerouslySetInnerHTML={{ __html: post.content }}
+                        />
 
                         {post.affiliateUrl && (
                             <aside className="mt-10 border-t border-white/10 pt-7">
