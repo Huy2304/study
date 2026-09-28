@@ -20,7 +20,11 @@ export async function generateMetadata({
 }: NewsDetailPageProps): Promise<Metadata> {
     const { slug } = await params;
     const [post] = await db
-        .select({ title: newsPosts.title, excerpt: newsPosts.excerpt })
+        .select({
+            title: newsPosts.title,
+            excerpt: newsPosts.excerpt,
+            coverImage: newsPosts.coverImage,
+        })
         .from(newsPosts)
         .where(and(eq(newsPosts.slug, slug), eq(newsPosts.isPublished, true)))
         .limit(1);
