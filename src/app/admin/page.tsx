@@ -7,6 +7,7 @@ import {
     Gamepad2,
     LayoutDashboard,
     Newspaper,
+    ShoppingBag,
     NotebookPen,
     Users,
 } from "lucide-react";
@@ -122,13 +123,20 @@ export default async function AdminPage() {
                 </div>
             </header>
 
-            <div className="mt-6">
+            <div className="mt-6 flex flex-wrap gap-3">
                 <Link
                     href="/admin/tin-tuc"
                     className="inline-flex items-center gap-2 rounded-xl bg-cyan-300 px-4 py-2.5 text-sm font-semibold text-cyan-950 transition hover:bg-cyan-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-100"
                 >
                     <Newspaper size={17} aria-hidden="true" />
                     Quản lý tin tức
+                </Link>
+                <Link
+                    href="/admin/goc-review"
+                    className="inline-flex items-center gap-2 rounded-xl bg-rose-500 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-rose-400 focus:outline-none focus-visible:ring-2 focus-visible:ring-rose-200"
+                >
+                    <ShoppingBag size={17} aria-hidden="true" />
+                    Quản lý Affiliate
                 </Link>
             </div>
 

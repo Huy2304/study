@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowRight, Newspaper } from "lucide-react";
-import { desc, eq, and } from "drizzle-orm";
+import { desc, eq, and, isNull, or } from "drizzle-orm";
 
 import { db } from "@/lib/db";
 import { newsPosts } from "@/lib/db/schema";
@@ -26,8 +26,15 @@ export default async function NewsPage({
     const offset = (page - 1) * pageSize;
 
     const condition = category
-        ? and(eq(newsPosts.isPublished, true), eq(newsPosts.category, category))
-        : eq(newsPosts.isPublished, true);
+        ? and(
+              eq(newsPosts.isPublished, true),
+              eq(newsPosts.category, category),
+              or(isNull(newsPosts.affiliateUrl), eq(newsPosts.affiliateUrl, ""))
+          )
+        : and(
+              eq(newsPosts.isPublished, true),
+              or(isNull(newsPosts.affiliateUrl), eq(newsPosts.affiliateUrl, ""))
+          );
 
     const posts = await db
         .select()

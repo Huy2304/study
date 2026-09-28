@@ -1,0 +1,1 @@
+const fs=require('fs'); let content=fs.readFileSync('c:/Users/OS/Desktop/study/src/app/page.tsx', 'utf8'); content = content.replace('    },\r\n    },\r\n    {', '    },\r\n    {'); content = content.replace('    },\n    },\n    {', '    },\n    {'); fs.writeFileSync('c:/Users/OS/Desktop/study/src/app/page.tsx', content);

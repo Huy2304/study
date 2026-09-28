@@ -1,10 +1,10 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { ArrowLeft, Newspaper } from "lucide-react";
-import { desc, isNull, or, eq } from "drizzle-orm";
+import { ArrowLeft, ShoppingBag } from "lucide-react";
+import { desc, isNotNull, and, ne } from "drizzle-orm";
 
 import AdminLogoutButton from "@/components/admin/AdminLogoutButton";
-import AdminNewsManager from "@/components/admin/AdminNewsManager";
+import AdminAffiliateManager from "@/components/admin/AdminAffiliateManager";
 import { db } from "@/lib/db";
 import { newsPosts } from "@/lib/db/schema";
 import { requireAdmin } from "@/lib/server/require-admin";
@@ -12,19 +12,24 @@ import { requireAdmin } from "@/lib/server/require-admin";
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
-    title: "Quản lý tin tức",
+    title: "Quản lý Affiliate",
     robots: {
         index: false,
         follow: false,
     },
 };
 
-export default async function AdminNewsPage() {
+export default async function AdminAffiliatePage() {
     await requireAdmin();
     const posts = await db
         .select()
         .from(newsPosts)
-        .where(or(isNull(newsPosts.affiliateUrl), eq(newsPosts.affiliateUrl, "")))
+        .where(
+            and(
+                isNotNull(newsPosts.affiliateUrl),
+                ne(newsPosts.affiliateUrl, "")
+            )
+        )
         .orderBy(desc(newsPosts.createdAt));
 
     return (
@@ -33,36 +38,36 @@ export default async function AdminNewsPage() {
                 <div>
                     <Link
                         href="/admin"
-                        className="inline-flex items-center gap-2 text-sm font-semibold text-cyan-200 transition hover:text-cyan-100"
+                        className="inline-flex items-center gap-2 text-sm font-semibold text-rose-300 transition hover:text-rose-200"
                     >
                         <ArrowLeft size={17} aria-hidden="true" />
                         Quản trị tổng quan
                     </Link>
-                    <p className="mt-5 inline-flex items-center gap-2 text-sm font-semibold uppercase tracking-[0.18em] text-cyan-200/80">
-                        <Newspaper size={17} aria-hidden="true" />
-                        Nội dung
+                    <p className="mt-5 inline-flex items-center gap-2 text-sm font-semibold uppercase tracking-[0.18em] text-rose-300/80">
+                        <ShoppingBag size={17} aria-hidden="true" />
+                        Thương mại
                     </p>
                     <h1 className="mt-3 text-3xl font-bold tracking-tight text-white sm:text-4xl">
-                        Quản lý tin tức
+                        Quản lý Affiliate
                     </h1>
                     <p className="mt-2 text-white/60">
-                        Soạn bài, gắn link affiliate và đưa bài viết lên trang công khai.
+                        Đăng sản phẩm, review và chèn link affiliate kiếm hoa hồng.
                     </p>
                 </div>
                 <div className="flex flex-wrap items-center gap-2">
                     <Link
-                        href="/tin-tuc"
+                        href="/goc-review"
                         target="_blank"
                         className="inline-flex w-fit items-center gap-2 rounded-xl border border-white/15 px-4 py-2.5 text-sm font-semibold text-white/80 transition hover:bg-white/10 hover:text-white"
                     >
-                        Xem trang tin tức
+                        Xem trang Affiliate
                     </Link>
                     <AdminLogoutButton />
                 </div>
             </header>
 
             <main className="py-8">
-                <AdminNewsManager initialPosts={posts} />
+                <AdminAffiliateManager initialPosts={posts} />
             </main>
         </div>
     );

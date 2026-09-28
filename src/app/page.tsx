@@ -5,6 +5,7 @@ import {
     Clock3,
     Gamepad2,
     LampDesk,
+    ShoppingBag,
     Trophy,
 } from "lucide-react";
 
@@ -108,6 +109,35 @@ const navigationCards = [
             </>
         ),
     },
+    {
+        id: "goc-review",
+        title: "Review",
+        icon: ShoppingBag,
+        href: "/goc-review",
+        accent: "text-rose-300",
+        panel: (
+            <>
+                <div>
+                    <p className="text-sm font-semibold uppercase tracking-[0.18em] text-rose-300/75">
+                        Mua sắm & Deal Hot
+                    </p>
+                    <h2 className="mt-2 text-2xl font-semibold text-white sm:text-3xl">
+                        Góc Review Sản Phẩm
+                    </h2>
+                    <p className="mt-2 max-w-xl leading-7 text-white/60">
+                        Tổng hợp đánh giá chi tiết, mã giảm giá và những sản phẩm chất lượng được gợi ý bởi StudyHay.
+                    </p>
+                </div>
+                <Link
+                    href="/goc-review"
+                    className="inline-flex w-fit items-center gap-2 rounded-xl border border-rose-300/25 bg-rose-300/10 px-4 py-2.5 text-sm font-semibold text-rose-200 transition hover:bg-rose-300/20 focus:outline-none focus-visible:ring-2 focus-visible:ring-rose-200"
+                >
+                    Săn deal ngay
+                    <ArrowRight size={17} aria-hidden="true" />
+                </Link>
+            </>
+        ),
+    }
 ];
 
 export default function Home() {
