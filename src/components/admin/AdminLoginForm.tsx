@@ -33,7 +33,7 @@ export default function AdminLoginForm() {
                 return;
             }
 
-            router.replace("/admin/tin-tuc");
+            router.replace("/admin");
             router.refresh();
         } catch {
             setError("Không thể đăng nhập. Vui lòng thử lại.");
